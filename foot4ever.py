@@ -441,7 +441,7 @@ class Foot4Ever():
 
         self.run(updater)
 
-    def run(self):
+    def run(self, updater):
         if mode == "dev":
             updater.start_polling()
             updater.idle()
