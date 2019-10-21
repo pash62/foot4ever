@@ -8,6 +8,7 @@
 #-------------------------------------------------------------------------------
 
 import os
+import sys
 import json
 from collections import OrderedDict
 import logging
@@ -19,9 +20,6 @@ import pandas as pd
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-mode = os.getenv("MODE")
-token = os.getenv("TOKEN")
 
 public_cmds = OrderedDict([('add','ثبت نام در بازی هفته بعد از ساعت ۶ روز جمعه')
                           ,('del','کنسل کردن ثبت نام')
@@ -442,6 +440,8 @@ class Foot4Ever():
         self.run(updater)
 
     def run(self, updater):
+        mode = os.getenv("MODE")
+        token = os.getenv("TOKEN")
         if mode == "dev":
             updater.start_polling()
             updater.idle()
