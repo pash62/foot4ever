@@ -20,6 +20,8 @@ import pandas as pd
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+mode = os.getenv("MODE")
+token = os.getenv("TOKEN")
 
 public_cmds = OrderedDict([('add','ثبت نام در بازی هفته بعد از ساعت ۶ روز جمعه')
                           ,('del','کنسل کردن ثبت نام')
@@ -436,8 +438,21 @@ class Foot4Ever():
 
         # log all errors
         updater.dispatcher.add_error_handler(self.error)
-        updater.start_polling()
-        updater.idle()
+
+        self.run(updater)
+
+    def run(self):
+        if mode == "dev":
+            updater.start_polling()
+            updater.idle()
+        elif mode == "prod":
+            port = int(os.environ.get("PORT", "8443"))
+            app_name = os.environ.get("APP_NAME")
+            updater.start_webhook(listen="0.0.0.0", port=port, url_path=token)
+            updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(app_name, token))
+        else:
+            logger.error("Invalid mode")
+            sys.exit(1)
 
     @WithLogError
     def set_prog(self, update, context):
