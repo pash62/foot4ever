@@ -421,7 +421,7 @@ class Foot4Ever():
     def __init__(self):
         self.token = os.getenv("TOKEN")
         updater = Updater(token=self.token, use_context=True)
-        self.bot = Bot(token)
+        self.bot = Bot(self.token)
 
         self.init_users_and_chats()
         self.init_dates()
