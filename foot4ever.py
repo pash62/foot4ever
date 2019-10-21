@@ -419,7 +419,8 @@ class Foot4Ever():
     Manages everything about weekly foot sessions
     """
     def __init__(self):
-        updater = Updater(token=token, use_context=True)
+        self.token = os.getenv("TOKEN")
+        updater = Updater(token=self.token, use_context=True)
         self.bot = Bot(token)
 
         self.init_users_and_chats()
@@ -441,15 +442,14 @@ class Foot4Ever():
 
     def run(self, updater):
         mode = os.getenv("MODE")
-        token = os.getenv("TOKEN")
         if mode == "dev":
             updater.start_polling()
             updater.idle()
         elif mode == "prod":
             port = int(os.environ.get("PORT", "8443"))
             app_name = os.environ.get("APP_NAME")
-            updater.start_webhook(listen="0.0.0.0", port=port, url_path=token)
-            updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(app_name, token))
+            updater.start_webhook(listen="0.0.0.0", port=port, url_path=self.token)
+            updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(app_name, self.token))
         else:
             logger.error("Invalid mode")
             sys.exit(1)
