@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 public_cmds = OrderedDict([('add','ثبت نام در بازی هفته بعد از ساعت ۶ روز جمعه')
                           ,('del','کنسل کردن ثبت نام')
                           ,('prog','دریافت روز و ساعت برنامه بازی آینده')
+                          ,('players','دریافت روز و بازیکنان بازی آینده')
                           ,('timkeshi','اجرای برنامه تیم کشی')])
 admin_cmds = OrderedDict([('add','اضافه کردن بازیکن در لیست ثبت نام')
                           ,('del','پاک کردن بازیکن از لیست ثبت نام')
@@ -58,7 +59,8 @@ class Msg():
     bad_set_prog_msg = 'فرمت تغییر برنامه می بایست به شکل زیر باشد: تاریخ ساعت ، مرکز'
     bad_set_prog_format = '25/05/2018 19:30, 1'
     bad_set_prog_succeed = 'تغییر برنامه با موفقییت انجام و به شرح ذیل می باشد'
-
+    sign_up_not_started = 'تاریخ بازی هفته آینده هنوز مشخص نمی باشد'
+    
 def create_player_keyboard(players):
     keyboard = []
     row = []
@@ -192,15 +194,15 @@ players_info =  { UserIds.ali_cre   :   (PerWord.ali_cre,   (2.86,3.13,3.00,2.50
                 , UserIds.soroosh   :   (PerWord.soroosh,   (4.85,3.21,3.35,2.42))
                 , UserIds.sia       :   (PerWord.sia,       (3.11,3.53,4.53,4.00))
                 , UserIds.parham    :   (PerWord.parham,    (2.00,3.00,4.00,4.50))
-                , UserIds.mehdi_v   :   (PerWord.mehdi_v,   (5.00,3.50,3.50,4.00))
+                , UserIds.mehdi_v   :   (PerWord.mehdi_v,   (4.00,3.50,3.50,4.00))
                 , UserIds.saleh     :   (PerWord.saleh,     (3.50,3.00,3.50,4.00))
                 , UserIds.milad     :   (PerWord.milad,     (3.00,3.00,4.50,4.00))
                 
-                , UserIds.mehrdad   :   (PerWord.mehrdad,   (5,5,5,5))
-                , UserIds.amin_mo   :   (PerWord.amin_mo,   (5,5,5,5))
-                , UserIds.babak     :   (PerWord.babak,     (3.5,3.5,3.5,3.5))
-                , UserIds.mehdi_k   :   (PerWord.mehdi_k,   (5,5,5,5))
-                , UserIds.reza      :   (PerWord.reza,      (5,5,5,5))}
+                , UserIds.mehrdad   :   (PerWord.mehrdad,   (3.00,4.00,4.00,4.00))
+                , UserIds.amin_mo   :   (PerWord.amin_mo,   (2.50,3.00,3.00,3.00))
+                , UserIds.babak     :   (PerWord.babak,     (3.50,3.50,3.50,3.50))
+                , UserIds.mehdi_k   :   (PerWord.mehdi_k,   (3.00,3.00,3.00,3.00))
+                , UserIds.reza      :   (PerWord.reza,      (4.00,3.50,3.00,2.50))}
 
 foreign_players_rates =   {'mouad'  : (2.50,3.50,4.00,5.00)
                           ,'mathieu': (2.00,3.00,3.50,4.00)
@@ -214,9 +216,6 @@ per_digits = {0:PerWord.zero, 1:PerWord.one, 2:PerWord.two, 3:PerWord.three, 4:P
 
 per_day_names = {0:PerWord.monday, 1:PerWord.tuesday, 2:PerWord.wednesday, 3:PerWord.thursday, 4:PerWord.friday, 5:PerWord.saturday, 6:PerWord.sunday}
 
-##
-default_next_players = [UserIds.pasha, UserIds.saman]
-#default_next_players = list(players_info.keys())
 
 def WithLogError(method):
     """
@@ -423,14 +422,14 @@ class Foot4Ever():
         updater = Updater(token=self.token, use_context=True)
         self.bot = Bot(self.token)
 
-        self.init_users_and_chats()
         self.init_dates()
+        self.init_users_and_chats()
         self.reset_teams()
 
         # Define a job to send weekly program with interval 7*24*60*60, 7 days, 24 hours, 60 minutes and 60 seconds
         open_inscription_date = self.get_open_inscription_date(self.next_date)
-        if datetime.datetime.now() < open_inscription_date:
-            updater.job_queue.run_repeating(self.send_weekly_prog, interval=7*24*60*60, first=open_inscription_date)
+        #if datetime.datetime.now() < open_inscription_date:
+        #    updater.job_queue.run_repeating(self.send_weekly_prog, interval=7*24*60*60, first=open_inscription_date)
 
         # Define commands
         self.init_commands(updater.dispatcher)
@@ -470,8 +469,10 @@ class Foot4Ever():
 
         self.init_dates(date, center_index)
         self.reset_teams()
+        self.cur_players = [UserIds.pasha, UserIds.saman]
         for user in self.all_players:
-            user.order_id = default_next_players.index(user.id) if user.id in default_next_players else -1
+            user.order_id = self.cur_players.index(user.id) if user.id in self.cur_players else -1
+        self.save_match_info()
         context.bot.send_message(chat_id=cur_chat_id, text=Msg.bad_set_prog_succeed)
         self.get_prog(update, context)
 
@@ -499,6 +500,7 @@ class Foot4Ever():
         dp.add_handler(CommandHandler('add', self.add_player, pass_args=True, pass_user_data=True))
         dp.add_handler(CommandHandler('del', self.del_player, pass_args=True, pass_user_data=True))
         dp.add_handler(CommandHandler('prog', self.get_prog))
+        dp.add_handler(CommandHandler('players', self.get_next_players))
         dp.add_handler(CommandHandler('help', self.help))
         dp.add_handler(CommandHandler('help_admins', self.help_admins))
         dp.add_handler(CommandHandler('all', self.get_all_players_username))
@@ -518,6 +520,10 @@ class Foot4Ever():
         self.foot_chat_id = self.chat_ids['Urban Football']
     
         self.all_players = []
+        ##
+        self.cur_players = [UserIds.pasha, UserIds.saman]
+        #self.cur_players = list(players_info.keys())
+        self.load_match_info()
         self.user_info_path = os.path.join(os.path.split(__file__)[0], 'user_info.txt')
         self.load_users()
 
@@ -532,13 +538,20 @@ class Foot4Ever():
             id, first_name, last_name = user.id, user.first_name, user.last_name
             print('{}: {} {}'.format(id, first_name, last_name))
             user = FootUser(id, first_name, last_name)
-            if user.id in default_next_players:
-                user.order_id = default_next_players.index(user.id)
+            if user.id in self.cur_players:
+                user.order_id = self.cur_players.index(user.id)
+                #print(f'{user.order_id},{user.foot_name}')
             if user.first_name.lower() in ['pasha', 'saman']:
                 self.admins.append(user.id)
                 user.is_admin = True
             self.all_players.append(user)
-        self.save_all_users_info()
+        # Add foreign players as well
+        for player in self.cur_players:
+            if isinstance(player, str):
+                #print(player)
+                user = self.add_foreign_player(player, False)
+                user.order_id = self.cur_players.index(player)
+        #self.save_all_users_info()
 
     def reset_teams(self):
         self.is_timkeshi_running = False
@@ -566,6 +579,9 @@ class Foot4Ever():
 
     @WithLogError
     def get_prog(self, update, context):
+        if self.next_date < datetime.datetime.now():
+            context.bot.send_message(chat_id=update.message.chat_id, text=Msg.sign_up_not_started)
+            return
         msg = '{}\n{}'.format(Msg.next_week_prog, self.get_next_program()) 
         context.bot.send_message(chat_id=update.message.chat_id, text=msg, parse_mode='HTML')
         lat, lon = list(self.centers.values())[self.next_center_index]
@@ -581,6 +597,14 @@ class Foot4Ever():
         msg += '\u200f \U0001f4cd Urbansoccer <b>{}</b> \n'.format(list(self.centers.keys())[self.next_center_index])
         return msg
 
+    @WithLogError
+    def get_next_players(self, update, context):
+        """
+        Next session program & players
+        """
+        cur_chat_id = update.effective_message.chat_id
+        context.bot.send_message(chat_id=cur_chat_id, text=self.get_program_and_players(), parse_mode='HTML')
+        
     def get_program_and_players(self):
         """
         Next session program & players
@@ -614,7 +638,7 @@ class Foot4Ever():
             user = FootUser(e_user.id, e_user.first_name, e_user.last_name)
             user.is_admin = user.id in self.admins
             self.all_players.append(user)
-            self.save_all_users_info()
+            #self.save_all_users_info()
         return user
 
     def get_open_inscription_date(self, date):
@@ -647,6 +671,10 @@ class Foot4Ever():
         cur_chat_id = update.effective_message.chat_id
         user = self.get_user_from_update(update)
         is_pasha = user.first_name.lower() == 'pasha'
+        if self.next_date < datetime.datetime.now():
+            context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
+            return
+            
         if not is_pasha and cur_chat_id != self.foot_chat_id:
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.wrong_page_add_del)
             return
@@ -655,8 +683,7 @@ class Foot4Ever():
             return self.add_del_forced_player(context.bot, update, context.args, True)
         
         if user.is_forbidden:
-            foot_name = PersianNames[user.first_name.lower()]
-            context.bot.send_message(chat_id=cur_chat_id, text='{} {}{}'.format(foot_name, PerWord.jan, Msg.you_are_forbidden))
+            context.bot.send_message(chat_id=cur_chat_id, text='{} {}{}'.format(user.foot_name, PerWord.jan, Msg.you_are_forbidden))
             return
 
         now = datetime.datetime.now()
@@ -666,12 +693,18 @@ class Foot4Ever():
 
         if user.order_id < 0:
             user.order_id = self.get_next_order_id()
+            self.save_match_info()
             context.bot.send_message(chat_id=cur_chat_id, text=self.get_program_and_players(), parse_mode='HTML')
     
     @WithLogError
     def del_player(self, update, context):
         cur_chat_id = update.effective_message.chat_id
         user = self.get_user_from_update(update)
+        is_pasha = user.first_name.lower() == 'pasha'
+        if self.next_date < datetime.datetime.now():
+            context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
+            return
+            
         if cur_chat_id != self.foot_chat_id and user.first_name.lower() != 'pasha':
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.wrong_page_add_del)
             return
@@ -679,7 +712,6 @@ class Foot4Ever():
         if len(context.args)>0:
             return self.add_del_forced_player(context.bot, update, context.args, False)
         
-        is_pasha = user.first_name.lower() == 'pasha'
         if not is_pasha and datetime.datetime.now() + datetime.timedelta(days=2) > self.next_date:
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.too_late_del)
             context.bot.send_message(chat_id=self.chat_ids['Foot Admin'], text='{} {}'.format(user.foot_name, Msg.try_to_del))
@@ -687,6 +719,7 @@ class Foot4Ever():
 
         if user.order_id>=0:
             user.order_id = -1
+            self.save_match_info()
             context.bot.send_message(chat_id=cur_chat_id, text=self.get_program_and_players(), parse_mode='HTML')
     
     def add_del_forced_player(self, bot, update, args, is_in_next_match):
@@ -697,18 +730,26 @@ class Foot4Ever():
             return
     
         for player in ' '.join(args).split(','):
-            user = FootUser.get_foot_user(self.all_players, user_name=player)
-            if not user:
-                names = player.split(' ')
-                user = FootUser(0, names[0], names[1] if len(names)>1 else '')
-                self.all_players.append(user)
-            if is_in_next_match:
-                user.order_id = self.get_next_order_id()
-            else:
-                user.order_id = -1
+            self.add_foreign_player(player, is_in_next_match)
             
+        self.save_match_info()
         bot.send_message(chat_id=update.effective_message.chat_id, text=self.get_program_and_players(), parse_mode='HTML')
 
+    def add_foreign_player(self, player, is_in_next_match):
+        """
+        Add manually a player in the list of all players and for the next match
+        """
+        user = FootUser.get_foot_user(self.all_players, user_name=player)
+        if not user:
+            names = player.split(' ')
+            user = FootUser(0, names[0], names[1] if len(names)>1 else '')
+            self.all_players.append(user)
+        if is_in_next_match:
+            user.order_id = self.get_next_order_id()
+        else:
+            user.order_id = -1
+        return user
+        
     def save_all_users_info(self):
         """
         Keep user names & Ids in a file
@@ -719,6 +760,35 @@ class Foot4Ever():
         if len(self.chat_ids) > 0:
             with open(self.chat_info_path, 'w') as f:
                 f.write(json.dumps(self.chat_ids))
+
+    def load_match_info(self):
+        """
+        loads match date and participants
+        """
+        self.match_info_path = os.path.join(os.path.split(__file__)[0], 'match_info.txt')
+        if not os.path.exists(self.match_info_path):
+            return
+
+        with open(self.match_info_path, 'r') as f:
+            content = json.load(f)
+        if content:
+            self.init_dates(date = content['date'], center_index = content['center_index'])
+            self.cur_players = content['cur_players'][:]
+
+    def save_match_info(self):
+        """
+        saves match date and participants
+        """
+        content = {}
+        content['date'] = datetime.datetime.strftime(self.next_date, '%d/%m/%Y %H:%M')
+        content['center_index'] = self.next_center_index
+        content['cur_players'] = []
+        for user in sorted(self.all_players, key = lambda x:x.order_id):
+            if user.order_id<0:
+                continue
+            content['cur_players'].append(user.id if user.id>0 else user.user_name)
+        with open(self.match_info_path, 'w') as f:
+            f.write(json.dumps(content))
 
     @WithLogError
     def show_add_forbidden_player_keyboard(self, update, context):
