@@ -85,6 +85,7 @@ def create_validation_keyboard():
 add - ثبت نام در بازی آینده
 del - کنسل کردن ثبت نام
 prog - دریافت روز و ساعت برنامه بازی آینده
+players - دریافت روز و بازیکنان بازی آینده
 timkeshi - اجرای برنامه تیم کشی
 help - راهنما
 help_admins - راهنمای ادمین
@@ -209,7 +210,8 @@ foreign_players_rates =   {'mouad'  : (2.50,3.50,4.00,5.00)
                           ,'yvon'   : (2.00,3.00,3.00,3.00)
                           ,'florin' : (2.50,3.00,4.00,5.00)
                           ,'francisco' : (2.00,2.50,2.50,4.00)
-                          ,'daniel' : (2.50,3.50,3.50,4.00)}
+                          ,'daniel' : (2.50,3.50,3.50,4.00)
+                          ,'anas' : (2.50,3.50,4.00,4.00)}
 
 per_digits = {0:PerWord.zero, 1:PerWord.one, 2:PerWord.two, 3:PerWord.three, 4:PerWord.four, 5:PerWord.five,
               6:PerWord.six, 7:PerWord.seven, 8:PerWord.eight, 9:PerWord.nine, 10:PerWord.ten}
