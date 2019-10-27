@@ -3,7 +3,7 @@
 #
 # Author:      Pasha Shadkami
 #
-# Created:     12/12/2017
+# Created:     27/10/2019
 # Copyright:   Pasha Shadkami
 #-------------------------------------------------------------------------------
 
@@ -22,46 +22,54 @@ import boto3
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-public_cmds = OrderedDict([('add','ثبت نام در بازی هفته بعد از ساعت ۶ روز جمعه')
-                          ,('del','کنسل کردن ثبت نام')
-                          ,('prog','دریافت روز و ساعت برنامه بازی آینده')
-                          ,('players','دریافت روز و بازیکنان بازی آینده')
-                          ,('timkeshi','اجرای برنامه تیم کشی')])
-admin_cmds = OrderedDict([('add','اضافه کردن بازیکن در لیست ثبت نام')
-                          ,('del','پاک کردن بازیکن از لیست ثبت نام')
-                          ,('add_mahroom','اضافه کردن بازیکن در لیست محرومین از ثبت نام')
-                          ,('del_mahroom','پاک کردن بازیکن از لیست محرومین از ثبت نام')
-                          ,('set_prog','تغییر برنامه هفته آینده')
-                          ,('all','دریافت اسم تمامی بازیکنان')])
-
-
+public_cmds = OrderedDict([('add',"S'inscrire dans le prochain match"),
+                           ('del',"Annuler l'inscription"),
+                           ('prog',"Afficher le prochain programme du jeu"),
+                           ('players',"Afficher les joueurs du prochain jeu"),
+                           ('arrange',"Arranger les équipes")])
+admin_cmds = OrderedDict([('add',"S'inscrire dans le prochain match"),
+                          ('del',"Annuler l'inscription"),
+                          ('add_susp',"Susprendre un joueur"),
+                          ('del_susp',"Annuler la suspension d'un joueur"),
+                          ('set_prog',"Mettre le prochain jeu"),
+                          ('all',"Afficher tous les noms")])
+                          
 class Msg():
-    wrong_page_add_del = 'به منظور ثبت نام و یا پاک نمودن ثبت نام، لطفا ابتدا به صفحه اصلی گروه رفته سپس دستور را تایپ نمایید'
-    wrong_place_timkeshi = 'به منظور تیم کشی، ابتدا یک گروه ساخته، کاپیتان دوم و من را به گروه دعوت ، سپس مجددا دستور را انتخاب کنید'
-    you_are_forbidden = 'شرمنده، شما این هفته از ثبت نام محروم هستی'
-    too_late_add = 'می دونم فوتبال دوست داری، اما باید تا جمعه ساعت شش برای ثبت نام مجدد صبر کنی'
-    too_late_del = 'کنسل کردن ثبت نام دیر بوده و دیگر میسر نمی باشد. لطفا با ادمین ها تماس حاصل کنید'
-    restart_timkeshi = 'جان با شما نبودم! با کاپیتان دوم بودم!!!'
-    missing_permission = 'شما مجاز به استفاده از این دستور نمی باشید'
-    select_player = 'لطفا یک بازیکن انتخاب کن (امتیازات از ۱ تا ۵: دروازه، دفاع، حمله، دوندگی)'
-    teamkeshi_welcome = 'کاپیتان اول، از اینکه تیم کشی را آغاز کردی ازت ممنونم! ای کاپیتان دوم، تو هم حاضر و آماده هستی؟'
-    validation_finish = 'مرسی! تیم کشی با موفقیت انجام شد. تیم ها به ادمین ها ارسال خواهند شد'
-    validation_finish2 = 'تیم کشی با موفقیت توسط {} و {} انجام شد و به شرح زیر می باشد'
-    team_rates = 'دروازه: {}، دفاع: {}، حمله: {}، دوندگی: {}'
-    ask_validation = 'تیمتو تایید می کنی؟ اوکی؟'
-    select_forbidden_player = 'بازیکنی که باید محروم شود را انتخاب کن'
-    select_unforbidden_player = 'بازیکن محرومی که باید پاک شود را انتخاب کن'
-    no_forbidden_player = 'در حال حاطر بازیکن محروم نداریم'
-    operation_cancelled = 'درخواست شما کنسل شد'
-    try_to_del = 'خواست کنسل کنه، من نگذاشتم! بدی نیست یک تماسی باهاش بگیرین'
-    next_week_prog ='برنامه هفته بعد:'
-    reserve = 'بازیکنان ذخیره'
-    timkeshi_is_running = 'تیم کشی در حال انجام می باشد. برای آغاز مجدد، لطفا ابتدا آن را کنسل کنید'
-    bad_set_prog_msg = 'فرمت تغییر برنامه می بایست به شکل زیر باشد: تاریخ ساعت ، مرکز'
-    bad_set_prog_format = '25/05/2018 19:30, 1'
-    bad_set_prog_succeed = 'تغییر برنامه با موفقییت انجام و به شرح ذیل می باشد'
-    sign_up_not_started = 'تاریخ بازی هفته آینده هنوز مشخص نمی باشد'
+    wrong_page_add_del = "Pour s'inscrire ou annuler l'inscription, allez d'abord sur la page du groupe."
+    wrong_place_timkeshi = "Pour arranger les équipes, créez d'abord un groupe, invitez ensuite l'autre capitaine."
+    you_are_forbidden = "Oops! Tu es suspendu pour le prochain jeu!"
+    too_late_del = "L'inscription ne peut pas être annulée dans les dernières 48h! Tu contactes les admins stp."
+    restart_timkeshi = "Je ne parlais pas à toi, je parlais au deuxième capitaine"
+    missing_permission = "Tu n'es pas autorisé à utiliser cette commande! Désolé!"
+    select_player = "c'est à toi de choisir (le score est de 1 à 5 dans cet ordre: goal, défense, attaque, course)"
+    teamkeshi_welcome = "je te remercie d'avoir commancé l'arrangement des équipes. Le deuxième capitaine, es-tu aussi prêt?"
+    validation_finish = "Parfait! Tout est nickel, les équipes seront envoyées aux admins."
+    validation_finish2 = "Les équipes suivantes sont faites par {} et {}:"
+    team_rates = "Goal: {}, Défense: {}, Attaque: {}, Course: {}"
+    ask_validation = "Tu confirmes ton équipe?"
+    select_forbidden_player = "Tu peux choisir maintenant le joueur suspendu du prochain match:"
+    select_unforbidden_player = "Tu peux enlever maintenant le joueur suspendu du prochain match:"
+    no_forbidden_player = "Il n'y a aucun joueur suspendu"
+    operation_cancelled = "L'operation a été annulée."
+    try_to_del = "a voulu annulé mais je l'ai empêché! Tu veux l'appeler peut-être?"
+    next_week_prog = "Le prochain jeu:"
+    reserve = "Les remplaçants:"
+    timkeshi_is_running = "L'arrangement des équipes est en train! Pour recommancer, il faut d'abord annuler celui d'en cours."
+    bad_set_prog_msg = "Le format doit être 'date heure, centre',\npar exemple: 01/01/2019 20:30, 0"
+    bad_set_prog_succeed = "Le changement suivant a effectué avec du succès:"
+    sign_up_not_started = "La date du prochain jeu n'est pas encore définie."
     
+# The description to set in bot father
+"""
+add - s'inscrire dans le prochain jeu
+del - annuler l'inscription
+prog - afficher la date du prochain jeu
+players - afficher les joueurs du prochain jeu
+arrange - faire des équipe
+help - aide
+help_admins - aide admins
+"""
+
 def create_player_keyboard(players):
     keyboard = []
     row = []
@@ -73,80 +81,31 @@ def create_player_keyboard(players):
             row = []
     if row:
         keyboard.append(row)
-    keyboard.append([InlineKeyboardButton(PerWord.cancel, callback_data=PerWord.cancel)])
+    keyboard.append([InlineKeyboardButton(MotFr.cancel, callback_data=MotFr.cancel)])
     return keyboard
 
 def create_validation_keyboard():
-    keyboard = [[InlineKeyboardButton(PerWord.yes, callback_data=PerWord.yes),
-                 InlineKeyboardButton(PerWord.no, callback_data=PerWord.no)]]
+    keyboard = [[InlineKeyboardButton(MotFr.yes, callback_data=MotFr.yes),
+                 InlineKeyboardButton(MotFr.no, callback_data=MotFr.no)]]
     return keyboard
 
 
-"""
-add - ثبت نام در بازی آینده
-del - کنسل کردن ثبت نام
-prog - دریافت روز و ساعت برنامه بازی آینده
-players - دریافت روز و بازیکنان بازی آینده
-timkeshi - اجرای برنامه تیم کشی
-help - راهنما
-help_admins - راهنمای ادمین
-"""
+class MotFr():
+    monday = 'Lundi'
+    tuesday = 'Mardi'
+    wednesday = 'Mercredi'
+    thursday = 'Jeudi'
+    friday = 'Vendredi'
+    saturday = 'Samedi'
+    sunday = 'Dimanche'
 
-class PerWord():
-    hamed_no = 'حامد'
-    pasha = 'پاشا'
-    ali_ju = 'علیرضا ژول'
-    ali_sh = 'علیرضا شی'
-    cyrus = 'سیروس'
-    hamid = 'حمید'
-    ali_cre = 'علی کخ'
-    sia = 'سیاوش'
-    soroosh = 'سروش'
-    mohammad = 'محمد'
-    saman = 'سامان'
-    amin = 'امین'
-    amin_mo = 'امین مو'
-    essy = 'اسفندیار'
-    armin = 'آرمین'
-    mori = 'مرتضی'
-    babak = 'بابک'
-    mehrdad = 'مهرداد'
-    navid = 'نوید'
-    mehdi_k = 'مهدی'
-    reza = 'رضا'
-    changiz = 'چنگیز'
-    milad = 'میلاد'
-    saleh = 'صالح'
-    mehdi_v = 'مهدی وح'
-    parham = 'پرهام'
-
-    zero = '۰'
-    one = '۱'
-    two = '۲'
-    three = '۳'
-    four = '۴'
-    five = '۵'
-    six = '۶'
-    seven = '۷'
-    eight = '۸'
-    nine = '۹'
-    ten = '۱۰'
-
-    monday = 'دوشنبه'
-    tuesday = 'سه شنبه'
-    wednesday = 'چهارشنبه'
-    thursday = 'پنجشنبه'
-    friday = 'جمعه'
-    saturday = 'شنبه'
-    sunday = 'یکشنبه'
-
-    cancel = 'کنسل'
-    yes = 'بلی'
-    no = 'خیر'
-    jan = 'جان، '
-    team = 'تیم'
-    white = 'سفید'
-    red = 'قرمز'
+    cancel = 'Anuler'
+    yes = 'Oui'
+    no = 'Non'
+    jan = 'cher, '
+    team = 'Equipe'
+    white = 'blanche'
+    red = 'rouge'
 
 
 class UserIds():
@@ -177,34 +136,34 @@ class UserIds():
     saleh = 316966952
     milad = 110228454                    
 
-# Contains user Id as key. Persian name, goal keepering, defensing, attacking and running rates
-players_info =  { UserIds.ali_cre   :   (PerWord.ali_cre,   (2.86,3.13,3.00,2.50))
-                , UserIds.ali_ju    :   (PerWord.ali_ju,    (2.89,3.00,4.28,3.17))
-                , UserIds.ali_sh    :   (PerWord.ali_sh,    (2.57,3.00,4.53,3.82))
-                , UserIds.amin      :   (PerWord.amin,      (2.41,2.95,3.20,2.70))
-                , UserIds.armin     :   (PerWord.armin,     (2.32,2.89,3.25,3.53))
-                , UserIds.changiz   :   (PerWord.changiz,   (5.00,1.00,1.00,1.00))
-                , UserIds.cyrus     :   (PerWord.cyrus,     (4.71,4.03,4.32,3.82))
-                , UserIds.essy      :   (PerWord.essy,      (2.89,3.67,3.82,3.50))
-                , UserIds.hamid     :   (PerWord.hamid,     (4.00,2.75,2.53,4.71))
-                , UserIds.hamed_no  :   (PerWord.hamed_no,  (2.96,4.00,2.82,3.03))
-                , UserIds.mohammad  :   (PerWord.mohammad,  (2.65,2.81,3.25,2.56))
-                , UserIds.mori      :   (PerWord.mori,      (3.28,4.71,3.28,4.21))
-                , UserIds.navid     :   (PerWord.navid,     (3.00,4.00,5.00,4.75))
-                , UserIds.pasha     :   (PerWord.pasha,     (2.35,3.53,3.00,3.39))
-                , UserIds.saman     :   (PerWord.saman,     (2.78,3.57,4.00,4.92))
-                , UserIds.soroosh   :   (PerWord.soroosh,   (4.85,3.21,3.35,2.42))
-                , UserIds.sia       :   (PerWord.sia,       (3.11,3.53,4.53,4.00))
-                , UserIds.parham    :   (PerWord.parham,    (2.00,3.00,4.00,4.50))
-                , UserIds.mehdi_v   :   (PerWord.mehdi_v,   (4.00,3.50,3.50,4.00))
-                , UserIds.saleh     :   (PerWord.saleh,     (3.50,3.00,3.50,4.00))
-                , UserIds.milad     :   (PerWord.milad,     (3.00,3.00,4.50,4.00))
+# Contains user Id as key. Value: goal keepering, defensing, attacking and running rates
+players_info =  { UserIds.ali_cre   :   (2.86,3.13,3.00,2.50)
+                , UserIds.ali_ju    :   (2.89,3.00,4.28,3.17)
+                , UserIds.ali_sh    :   (2.57,3.00,4.53,3.82)
+                , UserIds.amin      :   (2.41,2.95,3.20,2.70)
+                , UserIds.armin     :   (2.32,2.89,3.25,3.53)
+                , UserIds.changiz   :   (5.00,1.00,1.00,1.00)
+                , UserIds.cyrus     :   (4.71,4.03,4.32,3.82)
+                , UserIds.essy      :   (2.89,3.67,3.82,3.50)
+                , UserIds.hamid     :   (4.00,2.75,2.53,4.71)
+                , UserIds.hamed_no  :   (2.96,4.00,2.82,3.03)
+                , UserIds.mohammad  :   (2.65,2.81,3.25,2.56)
+                , UserIds.mori      :   (3.28,4.71,3.28,4.21)
+                , UserIds.navid     :   (3.00,4.00,5.00,4.75)
+                , UserIds.pasha     :   (2.35,3.53,3.00,3.39)
+                , UserIds.saman     :   (2.78,3.57,4.00,4.92)
+                , UserIds.soroosh   :   (4.85,3.21,3.35,2.42)
+                , UserIds.sia       :   (3.11,3.53,4.53,4.00)
+                , UserIds.parham    :   (2.00,3.00,4.00,4.50)
+                , UserIds.mehdi_v   :   (4.00,3.50,3.50,4.00)
+                , UserIds.saleh     :   (3.50,3.00,3.50,4.00)
+                , UserIds.milad     :   (3.00,3.00,4.50,4.00)
                 
-                , UserIds.mehrdad   :   (PerWord.mehrdad,   (3.00,4.00,4.00,4.00))
-                , UserIds.amin_mo   :   (PerWord.amin_mo,   (2.50,3.00,3.00,3.00))
-                , UserIds.babak     :   (PerWord.babak,     (3.50,3.50,3.50,3.50))
-                , UserIds.mehdi_k   :   (PerWord.mehdi_k,   (3.00,3.00,3.00,3.00))
-                , UserIds.reza      :   (PerWord.reza,      (4.00,3.50,3.00,2.50))}
+                , UserIds.mehrdad   :   (3.00,4.00,4.00,4.00)
+                , UserIds.amin_mo   :   (2.50,3.00,3.00,3.00)
+                , UserIds.babak     :   (3.50,3.50,3.50,3.50)
+                , UserIds.mehdi_k   :   (3.00,3.00,3.00,3.00)
+                , UserIds.reza      :   (4.00,3.50,3.00,2.50)}
 
 foreign_players_rates =   {'mouad'  : (2.50,3.50,4.00,5.00)
                           ,'mathieu': (2.00,3.00,3.50,4.00)
@@ -214,10 +173,7 @@ foreign_players_rates =   {'mouad'  : (2.50,3.50,4.00,5.00)
                           ,'daniel' : (2.50,3.50,3.50,4.00)
                           ,'anas' : (2.50,3.50,4.00,4.00)}
 
-per_digits = {0:PerWord.zero, 1:PerWord.one, 2:PerWord.two, 3:PerWord.three, 4:PerWord.four, 5:PerWord.five,
-              6:PerWord.six, 7:PerWord.seven, 8:PerWord.eight, 9:PerWord.nine, 10:PerWord.ten}
-
-per_day_names = {0:PerWord.monday, 1:PerWord.tuesday, 2:PerWord.wednesday, 3:PerWord.thursday, 4:PerWord.friday, 5:PerWord.saturday, 6:PerWord.sunday}
+day_names = {0:MotFr.monday, 1:MotFr.tuesday, 2:MotFr.wednesday, 3:MotFr.thursday, 4:MotFr.friday, 5:MotFr.saturday, 6:MotFr.sunday}
 
 
 def WithLogError(method):
@@ -251,26 +207,19 @@ class TeamKeshi():
     def add_player(self, captain_player, player):
         self.teams[captain_player].append(player)
 
-    def convert_to_persian_number(self, number):
-        persian_num = ''
-        number = '{0:.1f}'.format(number) if int(number) != number else str(int(number))
-        for digit in number:
-            try:
-                persian_num += per_digits[int(digit)]
-            except:
-                persian_num += '.'
-        return persian_num
+    def format_number(self, number):
+        return '{0:.1f}'.format(number) if int(number) != number else str(int(number))
 
     def create_player_keyboard(self):
-        cur_players = [player.foot_name for captain, players in self.teams.items() for player in players]
+        cur_players = [player.user_name for captain, players in self.teams.items() for player in players]
         players = []
         for player in self.players:
-            if player.foot_name in cur_players:
+            if player.user_name in cur_players:
                 continue
             if player.foot_rates is not None:
-                players.append('{}: {}'.format(player.foot_name, '|'.join([self.convert_to_persian_number(rate) for rate in player.foot_rates.tolist()])))
+                players.append('{}: {}'.format(player.user_name, '|'.join([self.format_number(rate) for rate in player.foot_rates.tolist()])))
             else:
-                players.append(player.foot_name)
+                players.append(player.user_name)
         return create_player_keyboard(players)
 
     def is_finish(self):
@@ -297,9 +246,8 @@ class TeamKeshi():
         txt = ''
         for captain, players in self.teams.items():
             is_white = captain == list(self.teams.keys())[0]
-            txt += '\n\u200f'
             txt += 3*'\u26aa' if is_white else 3*'\U0001f534' # Blue = \U0001f535
-            txt += ' {} {} '.format(PerWord.team, PerWord.white if is_white else PerWord.red)
+            txt += ' {} {} '.format(MotFr.team, MotFr.white if is_white else MotFr.red)
             txt += 3*'\u26aa' if is_white else 3*'\U0001f534' # Blue = \U0001f535
             txt += '\n'
 
@@ -314,14 +262,13 @@ class TeamKeshi():
                         rates += player.foot_rates
                         nb += 1
                 rates = rates/nb
-                rate_goa = self.convert_to_persian_number(rates[0])
-                rate_def = self.convert_to_persian_number(rates[1])
-                rate_att = self.convert_to_persian_number(rates[2])
-                rate_run = self.convert_to_persian_number(rates[3])
+                rate_goa = self.format_number(rates[0])
+                rate_def = self.format_number(rates[1])
+                rate_att = self.format_number(rates[2])
+                rate_run = self.format_number(rates[3])
                 txt += '{}\n'.format(Msg.team_rates.format(rate_goa, rate_def, rate_att, rate_run))
             for idx, player in enumerate(players):
-                txt += '\u200f{}. {}\n'.format(per_digits[idx+1], player.foot_name)
-            txt += '\u200f'
+                txt += '{}. {}\n'.format(idx+1, player.user_name)
 
         return txt
 
@@ -363,8 +310,8 @@ class TeamKeshi():
         Returns appropriated message depending on situation of team-keshi
         """
         is_finish = self.is_finish()
-        foot_name = self.whose_turn().foot_name
-        return '\u200f{} {}\n{}'.format(foot_name, Msg.ask_validation if is_finish else Msg.select_player, self.print_teams(False, True))
+        user_name = self.whose_turn().user_name
+        return '{}, {}\n\n{}'.format(user_name, Msg.ask_validation if is_finish else Msg.select_player, self.print_teams(False, True))
 
 
 class FootUser():
@@ -373,7 +320,6 @@ class FootUser():
         self.first_name = first_name
         self.last_name = last_name
         self.user_name = self.make_camel_case(first_name, last_name)
-        self.foot_name = self.get_foot_name()
         self.foot_rates = self.get_rates()
 
         # They will be set later
@@ -383,7 +329,7 @@ class FootUser():
 
     def get_rates(self):
         if self.id in list(players_info.keys()):
-            return pd.Series(players_info[self.id][1])
+            return pd.Series(players_info[self.id])
         if self.user_name.lower() in list(foreign_players_rates.keys()):
             return pd.Series(foreign_players_rates[self.user_name.lower()])
         return None
@@ -395,14 +341,8 @@ class FootUser():
         except:
             return '{}{}'.format(first_name[0].upper(), first_name[1:].lower())
 
-    def get_foot_name(self):
-        try:
-            return players_info[self.id][0]
-        except:
-            return self.user_name
-
     @staticmethod
-    def get_foot_user(all_players, user_id=None, user_name=None, foot_name=None):
+    def get_foot_user(all_players, user_id=None, user_name=None):
         """
         Returns FootUser by the given user_id
         """
@@ -411,9 +351,6 @@ class FootUser():
                 return user
             if user_name and user.user_name.lower() == user_name.lower():
                 return user
-            if foot_name and user.foot_name == foot_name:
-                return user
-
 
 
 class Foot4Ever():
@@ -429,10 +366,7 @@ class Foot4Ever():
         self.init_users_and_chats()
         self.reset_teams()
 
-        # Define a job to send weekly program with interval 7*24*60*60, 7 days, 24 hours, 60 minutes and 60 seconds
         open_inscription_date = self.get_open_inscription_date(self.next_date)
-        #if datetime.datetime.now() < open_inscription_date:
-        #    updater.job_queue.run_repeating(self.send_weekly_prog, interval=7*24*60*60, first=open_inscription_date)
 
         # Define commands
         self.init_commands(updater.dispatcher)
@@ -467,7 +401,7 @@ class Foot4Ever():
             date = parts[0]
             center_index = int(parts[1])
         except:
-            context.bot.send_message(chat_id=cur_chat_id, text='{}\n{}'.format(Msg.bad_set_prog_msg, Msg.bad_set_prog_format))
+            context.bot.send_message(chat_id=cur_chat_id, text=Msg.bad_set_prog_msg)
             return
 
         self.init_dates(date, center_index)
@@ -483,17 +417,9 @@ class Foot4Ever():
         """
         Information about next foot session
         """
-        self.next_date = datetime.datetime.strptime(date, '%d/%m/%Y %H:%M') ##
+        self.next_date = datetime.datetime.strptime(date, '%d/%m/%Y %H:%M')
         self.next_center_index = center_index
         self.centers = {'Aubervilliers':(48.907591, 2.375871), 'La Defense':(48.899902, 2.221698), "Porte d'Ivry":(48.820167, 2.393684)}
-
-    def send_weekly_prog(self, bot, job):
-        """
-        Job to send weekly program
-        """
-        bot.send_message(chat_id=self.foot_chat_id, text=self.get_next_program(), parse_mode='HTML')
-        lat, lon = list(self.centers.values())[self.next_center_index]
-        bot.send_location(chat_id=self.foot_chat_id, latitude=lat, longitude=lon)
 
     def init_commands(self, dp):
         """
@@ -507,9 +433,9 @@ class Foot4Ever():
         dp.add_handler(CommandHandler('help', self.help))
         dp.add_handler(CommandHandler('help_admins', self.help_admins))
         dp.add_handler(CommandHandler('all', self.get_all_players_username))
-        dp.add_handler(CommandHandler('add_mahroom', self.show_add_forbidden_player_keyboard, pass_user_data=True))
-        dp.add_handler(CommandHandler('del_mahroom', self.show_del_forbidden_player_keyboard, pass_user_data=True))
-        dp.add_handler(CommandHandler('timkeshi', self.show_timkeshi_buttons, pass_user_data=True))
+        dp.add_handler(CommandHandler('add_susp', self.show_add_forbidden_player_keyboard, pass_user_data=True))
+        dp.add_handler(CommandHandler('del_susp', self.show_del_forbidden_player_keyboard, pass_user_data=True))
+        dp.add_handler(CommandHandler('arrange', self.show_timkeshi_buttons, pass_user_data=True))
         dp.add_handler(CommandHandler('set_prog', self.set_prog, pass_args=True, pass_user_data=True))
         dp.add_handler(CallbackQueryHandler(self.on_btn_callback))
 
@@ -517,14 +443,13 @@ class Foot4Ever():
         self.chat_info_path = os.path.join(os.path.split(__file__)[0], 'chat_info.txt')
         if os.path.exists(self.chat_info_path):
             with open(self.chat_info_path) as f:
-                self.chat_ids = json.load(f) # contains all users Id:UserName
+                self.chat_ids = json.load(f)
         else:
             self.chat_ids = {}
         self.foot_chat_id = self.chat_ids['Urban Football']
     
         self.all_players = []
-        ##
-        self.cur_players = [UserIds.pasha, UserIds.saman]
+        self.cur_players = [UserIds.pasha, UserIds.saman] ##
         #self.cur_players = list(players_info.keys())
         self.load_match_info()
         self.user_info_path = os.path.join(os.path.split(__file__)[0], 'user_info.txt')
@@ -543,7 +468,7 @@ class Foot4Ever():
             user = FootUser(id, first_name, last_name)
             if user.id in self.cur_players:
                 user.order_id = self.cur_players.index(user.id)
-                #print(f'{user.order_id},{user.foot_name}')
+                #print(f'{user.order_id},{user.user_name}')
             if user.first_name.lower() in ['pasha', 'saman']:
                 self.admins.append(user.id)
                 user.is_admin = True
@@ -595,9 +520,9 @@ class Foot4Ever():
         Next session date & center
         """
         # another calendar icon: \U0001f4c6
-        msg = '\u200f \U0001f4c5 <b>{}</b> - {} \n'.format(per_day_names[self.next_date.weekday()], self.next_date.strftime('%d/%m/%Y'))
-        msg += '\u200f \u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+datetime.timedelta(minutes=90)).strftime('%Hh%M'))
-        msg += '\u200f \U0001f4cd Urbansoccer <b>{}</b> \n'.format(list(self.centers.keys())[self.next_center_index])
+        msg = '\U0001f4c5 <b>{}</b> - {} \n'.format(day_names[self.next_date.weekday()], self.next_date.strftime('%d/%m/%Y'))
+        msg += '\u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+datetime.timedelta(minutes=90)).strftime('%Hh%M'))
+        msg += '\U0001f4cd Urbansoccer <b>{}</b> \n'.format(list(self.centers.keys())[self.next_center_index])
         return msg
 
     @WithLogError
@@ -614,13 +539,12 @@ class Foot4Ever():
         """
         msg = '{}\n'.format(self.get_next_program())
         next_players = sorted(self.all_players, key = lambda x:x.order_id)
-        next_players = [player.foot_name for player in next_players if player.order_id>=0]
+        next_players = [player.user_name for player in next_players if player.order_id>=0]
         
         for index, player in enumerate(next_players):
             if index == 10:
                 msg += '\n{}:\n'.format(Msg.reserve)
-            msg += '\u200f{}. {}\n'.format(per_digits[index+1] if index < 10 else per_digits[index-9], player)
-        msg += '\u200f'
+            msg += '{}. {}\n'.format(index+1 if index < 10 else index-9, player)
         return msg
 
     @WithLogError
@@ -686,12 +610,7 @@ class Foot4Ever():
             return self.add_del_forced_player(context.bot, update, context.args, True)
         
         if user.is_forbidden:
-            context.bot.send_message(chat_id=cur_chat_id, text='{} {}{}'.format(user.foot_name, PerWord.jan, Msg.you_are_forbidden))
-            return
-
-        now = datetime.datetime.now()
-        if not is_pasha and (now > self.next_date or now < self.get_open_inscription_date(self.next_date)):
-            context.bot.send_message(chat_id=cur_chat_id, text=Msg.too_late_add)
+            context.bot.send_message(chat_id=cur_chat_id, text='{}, {}'.format(user.user_name, Msg.you_are_forbidden))
             return
 
         if user.order_id < 0:
@@ -717,7 +636,7 @@ class Foot4Ever():
         
         if not is_pasha and datetime.datetime.now() + datetime.timedelta(days=2) > self.next_date:
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.too_late_del)
-            context.bot.send_message(chat_id=self.chat_ids['Foot Admin'], text='{} {}'.format(user.foot_name, Msg.try_to_del))
+            context.bot.send_message(chat_id=self.chat_ids['Foot Admin'], text='{} {}'.format(user.user_name, Msg.try_to_del))
             return
 
         if user.order_id>=0:
@@ -817,7 +736,7 @@ class Foot4Ever():
         ADMIN ONLY: Shows a keyboard to select forbidden player from the next session
         """
         if self.is_admin(context.bot, update):
-            players = [user.foot_name for user in self.all_players if not user.is_forbidden]
+            players = [user.user_name for user in self.all_players if not user.is_forbidden]
             reply_markup = InlineKeyboardMarkup(create_player_keyboard(players))
             update.message.reply_text(Msg.select_forbidden_player, reply_markup=reply_markup)
 
@@ -827,7 +746,7 @@ class Foot4Ever():
         ADMIN ONLY: Shows a keyboard to delete a forbidden player from the next session
         """
         if self.is_admin(context.bot, update):
-            forbidden_players = [user.foot_name for user in self.all_players if user.is_forbidden]
+            forbidden_players = [user.user_name for user in self.all_players if user.is_forbidden]
             if not forbidden_players:
                 context.bot.send_message(text=Msg.no_forbidden_player, chat_id=update.message.chat_id)
             else:
@@ -839,15 +758,15 @@ class Foot4Ever():
         Add forbidden player from the next session
         """
         query = update.callback_query
-        if query.data == PerWord.cancel:
+        if query.data == MotFr.cancel:
             bot.edit_message_text(text=Msg.operation_cancelled, message_id=query.message.message_id, chat_id=query.message.chat_id)
             return
 
-        user = FootUser.get_foot_user(self.all_players, foot_name=query.data)
+        user = FootUser.get_foot_user(self.all_players, user_name=query.data)
         user.is_forbidden = True
         user.order_id = -1
 
-        msg = '{}\n{}'.format('بازیکنان محروم:', ', '.join([user.foot_name for user in self.all_players if user.is_forbidden]))
+        msg = '{}\n{}'.format('بازیکنان محروم:', ', '.join([user.user_name for user in self.all_players if user.is_forbidden]))
         bot.edit_message_text(text=msg, message_id=query.message.message_id, chat_id=query.message.chat_id)
         bot.send_message(chat_id=query.message.chat_id, text=self.get_program_and_players(), parse_mode='HTML')
 
@@ -856,14 +775,14 @@ class Foot4Ever():
         Delete forbidden player from the next session
         """
         query = update.callback_query
-        if query.data == PerWord.cancel:
+        if query.data == MotFr.cancel:
             bot.edit_message_text(text=Msg.operation_cancelled, message_id=query.message.message_id, chat_id=query.message.chat_id)
             return
     
-        user = FootUser.get_foot_user(self.all_players, foot_name=query.data)
+        user = FootUser.get_foot_user(self.all_players, user_name=query.data)
         user.is_forbidden = False
         
-        forbidden_players = [user.foot_name for user in self.all_players if user.is_forbidden]
+        forbidden_players = [user.user_name for user in self.all_players if user.is_forbidden]
         msg = '{}\n{}'.format('بازیکنان محروم', ', '.join(forbidden_players)) if forbidden_players else Msg.no_forbidden_player
         bot.edit_message_text(text=msg, message_id=query.message.message_id, chat_id=query.message.chat_id)
 
@@ -891,7 +810,7 @@ class Foot4Ever():
         cur_user = self.get_user_from_update(update)
         self.team_keshi.add_captain(cur_user) # Add first captain
         reply_markup = InlineKeyboardMarkup(create_validation_keyboard())
-        update.message.reply_text('{} {}'.format(cur_user.foot_name, Msg.teamkeshi_welcome), reply_markup=reply_markup)
+        update.message.reply_text('{}, {}'.format(cur_user.user_name, Msg.teamkeshi_welcome), reply_markup=reply_markup)
 
     def on_show_timkeshi_buttons(self, bot, update):
         """
@@ -916,38 +835,40 @@ class Foot4Ever():
         Performs the related action when user touch on of the team-keshi buttons
         """
         query = update.callback_query
-        if query.data in [PerWord.cancel, PerWord.no]:
+        if query.data in [MotFr.cancel, MotFr.no]:
             bot.edit_message_text(text=Msg.operation_cancelled, message_id=query.message.message_id, chat_id=query.message.chat_id)
             self.reset_teams()
             return
 
         cur_user = self.get_user_from_update(update)
-        if query.data == PerWord.yes:
+        if query.data == MotFr.yes:
             if self.team_keshi.is_finish():
                 self.team_keshi.set_validation(self.team_keshi.whose_turn())
                 if self.team_keshi.is_both_validated():
-                    self.bot.send_message(self.chat_ids['Foot Admin'], self.team_keshi.print_teams(False, True))
+                    self.bot.send_message(self.chat_ids['Teste team keshi'], self.team_keshi.print_teams(False, True))
                     final_teams = self.team_keshi.print_teams(True, False)
                     msg = '{}\n{}'.format(Msg.validation_finish, final_teams)
                     bot.edit_message_text(text=msg, chat_id=query.message.chat_id, message_id=query.message.message_id)
-                    captain1, captain2 = list(self.team_keshi.teams.keys())[0].foot_name, list(self.team_keshi.teams.keys())[1].foot_name
+                    captain1, captain2 = list(self.team_keshi.teams.keys())[0].user_name, list(self.team_keshi.teams.keys())[1].user_name
                     self.bot.send_message(self.chat_ids['Foot Admin'], Msg.validation_finish2.format(captain1, captain2))##
+                    #self.bot.send_message(self.chat_ids['Teste team keshi'], Msg.validation_finish2.format(captain1, captain2))##
                     msg = '{}{}'.format(self.get_next_program(), final_teams)
                     self.bot.send_message(self.chat_ids['Foot Admin'], msg, parse_mode='HTML')##
+                    #self.bot.send_message(self.chat_ids['Teste team keshi'], msg, parse_mode='HTML')##
                     self.reset_teams()
                     return
             else:
                 #cur_user = FootUser.get_foot_user(self.all_players, user_id=UserIds.ali_cre) ##
                 if cur_user.id == list(self.team_keshi.teams.keys())[0].id:
-                    msg = '{} {}\n'.format(cur_user.foot_name, Msg.restart_timkeshi)
-                    msg += '{} {}'.format(cur_user.foot_name, Msg.teamkeshi_welcome)
+                    msg = '{} {}\n'.format(cur_user.user_name, Msg.restart_timkeshi)
+                    msg += '{}, {}'.format(cur_user.user_name, Msg.teamkeshi_welcome)
                     update.effective_message.reply_text(msg)
                     return
                 self.team_keshi.add_captain(cur_user) # Add 2nd captain
         else:
             #cur_user = self.team_keshi.whose_turn() ##
             if cur_user.id == self.team_keshi.whose_turn().id:
-                self.team_keshi.add_player(cur_user, FootUser.get_foot_user(self.all_players, foot_name=query.data.split(':')[0]))
+                self.team_keshi.add_player(cur_user, FootUser.get_foot_user(self.all_players, user_name=query.data.split(':')[0]))
 
         self.on_show_timkeshi_buttons(bot, update)
 
