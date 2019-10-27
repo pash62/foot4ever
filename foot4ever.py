@@ -771,7 +771,7 @@ class Foot4Ever():
         self.secret_key = os.getenv('CLOUDCUBE_SECRET_ACCESS_KEY')
         self.url = os.getenv('CLOUDCUBE_URL')
         self.cube_name = self.url.split('/')[-1]
-        self.bucket_name = url.split('https://')[-1].split('.')[0]
+        self.bucket_name = self.url.split('https://')[-1].split('.')[0]
         self.s3 = boto3.client('s3', aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
         self.match_info_s3 = os.path.join(self.cube_name, 'match_info.txt')
         self.match_info = os.path.join(os.path.split(__file__)[0], 'match_info.txt')
@@ -809,7 +809,7 @@ class Foot4Ever():
             f.write(json.dumps(content))
                 
         try:
-            self.s3.upload_file(file_path, self.bucket_name, self.match_info_s3)
+            self.s3.upload_file(self.match_info, self.bucket_name, self.match_info_s3)
             print("Upload Successful")
         except FileNotFoundError:
             print("The file was not found")
