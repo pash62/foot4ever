@@ -4,3 +4,4 @@ django-heroku
 requests
 python-telegram-bot
 pandas
+boto3
