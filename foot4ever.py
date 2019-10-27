@@ -780,7 +780,7 @@ class Foot4Ever():
         try:
             self.s3.download_file(self.bucket_name, self.match_info_s3, self.match_info)
         except Exception as e:
-            print(f'Failed to get the match info file: {str(e)})
+            print(f'Failed to get the match info file: {str(e)}')
             return
 
         with open(self.match_info, 'r') as f:
@@ -809,7 +809,7 @@ class Foot4Ever():
             self.s3.upload_file(self.match_info, self.bucket_name, self.match_info_s3)
             print("Upload Successful")
         except Exception as e:
-            print(f'Failed to upload the match info file: {str(e)})
+            print(f'Failed to upload the match info file: {str(e)}')
             return
 
     @WithLogError
