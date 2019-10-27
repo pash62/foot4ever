@@ -18,7 +18,6 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import datetime
 import pandas as pd
 import boto3
-from botocore.exceptions import NoCredentialsError
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -780,9 +779,8 @@ class Foot4Ever():
         
         try:
             self.s3.download_file(self.bucket_name, self.match_info_s3, self.match_info)
-            print("Upload Successful")
-        except:
-            print("Failed to get the file")
+        except Exception as e:
+            print(f'Failed to get the match info file: {str(e)})
             return
 
         with open(self.match_info, 'r') as f:
@@ -810,10 +808,9 @@ class Foot4Ever():
         try:
             self.s3.upload_file(self.match_info, self.bucket_name, self.match_info_s3)
             print("Upload Successful")
-        except FileNotFoundError:
-            print("The file was not found")
-        except NoCredentialsError:
-            print("Credentials not available")
+        except Exception as e:
+            print(f'Failed to upload the match info file: {str(e)})
+            return
 
     @WithLogError
     def show_add_forbidden_player_keyboard(self, update, context):
