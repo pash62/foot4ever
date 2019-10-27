@@ -17,6 +17,8 @@ from telegram.bot import Bot
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 import datetime
 import pandas as pd
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
