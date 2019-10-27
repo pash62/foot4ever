@@ -474,9 +474,9 @@ class Foot4Ever():
         self.cur_players = [UserIds.pasha, UserIds.saman]
         for user in self.all_players:
             user.order_id = self.cur_players.index(user.id) if user.id in self.cur_players else -1
-        self.save_match_info()
         context.bot.send_message(chat_id=cur_chat_id, text=Msg.bad_set_prog_succeed)
         self.get_prog(update, context)
+        self.save_match_info()
 
     def init_dates(self, date = '20/06/2018 19:30', center_index = 2):
         """
@@ -695,8 +695,8 @@ class Foot4Ever():
 
         if user.order_id < 0:
             user.order_id = self.get_next_order_id()
-            self.save_match_info()
             context.bot.send_message(chat_id=cur_chat_id, text=self.get_program_and_players(), parse_mode='HTML')
+            self.save_match_info()
     
     @WithLogError
     def del_player(self, update, context):
@@ -721,8 +721,8 @@ class Foot4Ever():
 
         if user.order_id>=0:
             user.order_id = -1
-            self.save_match_info()
             context.bot.send_message(chat_id=cur_chat_id, text=self.get_program_and_players(), parse_mode='HTML')
+            self.save_match_info()
     
     def add_del_forced_player(self, bot, update, args, is_in_next_match):
         """
