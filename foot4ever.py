@@ -781,11 +781,8 @@ class Foot4Ever():
         try:
             self.s3.download_file(self.bucket_name, self.match_info_s3, self.match_info)
             print("Upload Successful")
-        except FileNotFoundError:
-            print("The file was not found")
-            return
-        except NoCredentialsError:
-            print("Credentials not available")
+        except:
+            print("Failed to get the file")
             return
 
         with open(self.match_info, 'r') as f:
