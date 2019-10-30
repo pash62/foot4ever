@@ -1,1 +1,1 @@
-web: python foot4ever.py
+web: python foot4everfr.py
