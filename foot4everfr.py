@@ -44,16 +44,17 @@ class Msg():
     select_player = "c'est à toi de choisir (le score est de 1 à 5 dans cet ordre: goal, défense, attaque, course)"
     teamkeshi_welcome = "je te remercie d'avoir commancé l'arrangement des équipes. Le deuxième capitaine, es-tu aussi prêt?"
     validation_finish = "Parfait! Tout est nickel, les équipes seront envoyées aux admins."
-    validation_finish2 = "Les équipes suivantes sont faites par {} et {}:"
+    validation_finish2 = "Voici les équipes faites par {} et {}:"
     team_rates = "Goal: {}, Défense: {}, Attaque: {}, Course: {}"
     ask_validation = "Tu confirmes ton équipe?"
     select_forbidden_player = "Tu peux choisir maintenant le joueur suspendu du prochain match:"
     select_unforbidden_player = "Tu peux enlever maintenant le joueur suspendu du prochain match:"
     no_forbidden_player = "Il n'y a aucun joueur suspendu"
+    forbidden_player = "Joueurs supendus:"
     operation_cancelled = "L'operation a été annulée."
     try_to_del = "a voulu annulé mais je l'ai empêché! Tu veux l'appeler peut-être?"
     next_week_prog = "Le prochain jeu:"
-    reserve = "Les remplaçants:"
+    reserve = "Les remplaçants"
     timkeshi_is_running = "L'arrangement des équipes est en train! Pour recommancer, il faut d'abord annuler celui d'en cours."
     bad_set_prog_msg = "Le format doit être 'date heure, centre',\npar exemple: 01/01/2019 20:30, 0"
     bad_set_prog_succeed = "Le changement suivant a effectué avec du succès:"
@@ -107,71 +108,6 @@ class MotFr():
     white = 'blanche'
     red = 'rouge'
 
-
-class UserIds():
-    hamed_no = 76017323
-    pasha = 122707272
-    ali_ju = 132438059
-    ali_sh = 104542063
-    cyrus = 114173106
-    hamid = 501194040
-    ali_cre = 240732760
-    sia = 200115880
-    soroosh = 107547421
-    saman = 118674419
-    essy = 264694076
-    babak = 472586769
-    armin = 315665388
-    amin_mo = 117948828
-    amin = 102490025
-    mehdi_k = 95201504
-    mehdi_v = 296955045
-    navid = 161869718
-    mehrdad = 359343302
-    reza = 94006043
-    mori = 161625455
-    mohammad = 86055925
-    changiz = 118876980
-    parham = 45177826
-    saleh = 316966952
-    milad = 110228454                    
-
-# Contains user Id as key. Value: goal keepering, defensing, attacking and running rates
-players_info =  { UserIds.ali_cre   :   (2.86,3.13,3.00,2.50)
-                , UserIds.ali_ju    :   (2.89,3.00,4.28,3.17)
-                , UserIds.ali_sh    :   (2.57,3.00,4.53,3.82)
-                , UserIds.amin      :   (2.41,2.95,3.20,2.70)
-                , UserIds.armin     :   (2.32,2.89,3.25,3.53)
-                , UserIds.changiz   :   (5.00,1.00,1.00,1.00)
-                , UserIds.cyrus     :   (4.71,4.03,4.32,3.82)
-                , UserIds.essy      :   (2.89,3.67,3.82,3.50)
-                , UserIds.hamid     :   (4.00,2.75,2.53,4.71)
-                , UserIds.hamed_no  :   (2.96,4.00,2.82,3.03)
-                , UserIds.mohammad  :   (2.65,2.81,3.25,2.56)
-                , UserIds.mori      :   (3.28,4.71,3.28,4.21)
-                , UserIds.navid     :   (3.00,4.00,5.00,4.75)
-                , UserIds.pasha     :   (2.35,3.53,3.00,3.39)
-                , UserIds.saman     :   (2.78,3.57,4.00,4.92)
-                , UserIds.soroosh   :   (4.85,3.21,3.35,2.42)
-                , UserIds.sia       :   (3.11,3.53,4.53,4.00)
-                , UserIds.parham    :   (2.00,3.00,4.00,4.50)
-                , UserIds.mehdi_v   :   (4.00,3.50,3.50,4.00)
-                , UserIds.saleh     :   (3.50,3.00,3.50,4.00)
-                , UserIds.milad     :   (3.00,3.00,4.50,4.00)
-                
-                , UserIds.mehrdad   :   (3.00,4.00,4.00,4.00)
-                , UserIds.amin_mo   :   (2.50,3.00,3.00,3.00)
-                , UserIds.babak     :   (3.50,3.50,3.50,3.50)
-                , UserIds.mehdi_k   :   (3.00,3.00,3.00,3.00)
-                , UserIds.reza      :   (4.00,3.50,3.00,2.50)}
-
-foreign_players_rates =   {'mouad'  : (2.50,3.50,4.00,5.00)
-                          ,'mathieu': (2.00,3.00,3.50,4.00)
-                          ,'yvon'   : (2.00,3.00,3.00,3.00)
-                          ,'florin' : (2.50,3.00,4.00,5.00)
-                          ,'francisco' : (2.00,2.50,2.50,4.00)
-                          ,'daniel' : (2.50,3.50,3.50,4.00)
-                          ,'anas' : (2.50,3.50,4.00,4.00)}
 
 day_names = {0:MotFr.monday, 1:MotFr.tuesday, 2:MotFr.wednesday, 3:MotFr.thursday, 4:MotFr.friday, 5:MotFr.saturday, 6:MotFr.sunday}
 
@@ -269,7 +205,7 @@ class TeamKeshi():
                 txt += '{}\n'.format(Msg.team_rates.format(rate_goa, rate_def, rate_att, rate_run))
             for idx, player in enumerate(players):
                 txt += '{}. {}\n'.format(idx+1, player.user_name)
-
+            txt += '\n'
         return txt
 
     def whose_turn(self):
@@ -315,22 +251,22 @@ class TeamKeshi():
 
 
 class FootUser():
-    def __init__(self, user_id, first_name, last_name):
+    def __init__(self, user_id, first_name, last_name, players_info, foreign_players_rates):
         self.id = user_id
         self.first_name = first_name
         self.last_name = last_name
         self.user_name = self.make_camel_case(first_name, last_name)
-        self.foot_rates = self.get_rates()
+        self.foot_rates = self.get_rates(players_info, foreign_players_rates)
 
         # They will be set later
         self.is_forbidden = False
         self.order_id = -1 # if order id is bigger-equal than 0, it means user plays in the next match
         self.is_admin = False
 
-    def get_rates(self):
-        if self.id in list(players_info.keys()):
-            return pd.Series(players_info[self.id])
-        if self.user_name.lower() in list(foreign_players_rates.keys()):
+    def get_rates(self, players_info, foreign_players_rates):
+        if str(self.id) in list(players_info.keys()):
+            return pd.Series(players_info[str(self.id)][1])
+        if self.user_name.lower() in foreign_players_rates:
             return pd.Series(foreign_players_rates[self.user_name.lower()])
         return None
 
@@ -358,6 +294,7 @@ class Foot4Ever():
     Manages everything about weekly foot sessions
     """
     def __init__(self):
+        self.mode = 'os.getenv('MODE')
         self.token = os.getenv('TOKEN')
         updater = Updater(token=self.token, use_context=True)
         self.bot = Bot(self.token)
@@ -377,11 +314,10 @@ class Foot4Ever():
         self.run(updater)
 
     def run(self, updater):
-        mode = os.getenv('MODE')
-        if mode == 'DEV':
+        if self.mode == 'DEV':
             updater.start_polling()
             updater.idle()
-        elif mode == 'PROD':
+        elif self.mode == 'PROD':
             port = int(os.environ.get('PORT', '8443'))
             app_name = os.environ.get('APP_NAME')
             updater.start_webhook(listen='0.0.0.0', port=port, url_path=self.token)
@@ -406,9 +342,8 @@ class Foot4Ever():
 
         self.init_dates(date, center_index)
         self.reset_teams()
-        self.cur_players = [UserIds.pasha, UserIds.saman]
         for user in self.all_players:
-            user.order_id = self.cur_players.index(user.id) if user.id in self.cur_players else -1
+            user.order_id = self.admins.index(user.id) if user.id in self.admins else -1
         context.bot.send_message(chat_id=cur_chat_id, text=Msg.bad_set_prog_succeed)
         self.get_prog(update, context)
         self.save_match_info()
@@ -449,9 +384,11 @@ class Foot4Ever():
         self.foot_chat_id = self.chat_ids['Urban Football']
     
         self.all_players = []
-        self.cur_players = [UserIds.pasha, UserIds.saman] ##
-        #self.cur_players = list(players_info.keys())
+        self.cur_players = []
+        self.init_s3()
+        self.load_user_rates()
         self.load_match_info()
+        #self.cur_players = [int(user_id) for user_id in self.players_info.keys()] ##
         self.user_info_path = os.path.join(os.path.split(__file__)[0], 'user_info.txt')
         self.load_users()
 
@@ -465,7 +402,7 @@ class Foot4Ever():
             user = chat_member.user
             id, first_name, last_name = user.id, user.first_name, user.last_name
             print('{}: {} {}'.format(id, first_name, last_name))
-            user = FootUser(id, first_name, last_name)
+            user = FootUser(id, first_name, last_name, self.players_info, self.foreign_players_rates)
             if user.id in self.cur_players:
                 user.order_id = self.cur_players.index(user.id)
                 #print(f'{user.order_id},{user.user_name}')
@@ -562,7 +499,7 @@ class Foot4Ever():
         e_user = update.effective_user
         user = FootUser.get_foot_user(self.all_players, user_id=e_user.id)
         if not user:
-            user = FootUser(e_user.id, e_user.first_name, e_user.last_name)
+            user = FootUser(e_user.id, e_user.first_name, e_user.last_name, self.players_info, self.foreign_players_rates)
             user.is_admin = user.id in self.admins
             self.all_players.append(user)
             #self.save_all_users_info()
@@ -664,7 +601,7 @@ class Foot4Ever():
         user = FootUser.get_foot_user(self.all_players, user_name=player)
         if not user:
             names = player.split(' ')
-            user = FootUser(0, names[0], names[1] if len(names)>1 else '')
+            user = FootUser(0, names[0], names[1] if len(names)>1 else '', self.players_info, self.foreign_players_rates)
             self.all_players.append(user)
         if is_in_next_match:
             user.order_id = self.get_next_order_id()
@@ -683,30 +620,56 @@ class Foot4Ever():
             with open(self.chat_info_path, 'w') as f:
                 f.write(json.dumps(self.chat_ids))
 
-    def load_match_info(self):
-        """
-        loads match date and participants
-        """
+    def init_s3(self):
+        if not self.mode == 'PROD':
+            return
         self.access_key = os.getenv('CLOUDCUBE_ACCESS_KEY_ID')
         self.secret_key = os.getenv('CLOUDCUBE_SECRET_ACCESS_KEY')
         self.url = os.getenv('CLOUDCUBE_URL')
         self.cube_name = self.url.split('/')[-1]
         self.bucket_name = self.url.split('https://')[-1].split('.')[0]
         self.s3 = boto3.client('s3', aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
-        self.match_info_s3 = os.path.join(self.cube_name, 'match_info.txt')
-        self.match_info = os.path.join(os.path.split(__file__)[0], 'match_info.txt')
-        
-        try:
-            self.s3.download_file(self.bucket_name, self.match_info_s3, self.match_info)
-        except Exception as e:
-            print(f'Failed to get the match info file: {str(e)}')
-            return
 
-        with open(self.match_info, 'r') as f:
+    def load_match_info(self):
+        """
+        loads match date and participants
+        """
+        self.match_info = os.path.join(os.path.split(__file__)[0], 'match_info.txt')
+
+        if self.mode == 'PROD':
+            self.match_info_s3 = os.path.join(self.cube_name, 'match_info.txt')
+            try:
+                self.s3.download_file(self.bucket_name, self.match_info_s3, self.match_info)
+            except Exception as e:
+                print(f'Failed to get the match info file: {str(e)}')
+                return
+
+        if self.match_info and os.path.exists(self.match_info):
+            with open(self.match_info, 'r') as f:
+                content = json.load(f)
+            if content:
+                self.init_dates(date = content['date'], center_index = content['center_index'])
+                self.cur_players = content['cur_players'][:]
+
+    def load_user_rates(self):
+        """
+        Load user rates if the file is available
+        """
+        self.user_rates = os.path.join(os.path.split(__file__)[0], 'user_rates.json')
+
+        if self.mode == 'PROD':
+            self.user_rates_s3 = os.path.join(self.cube_name, 'user_rates.json')
+            try:
+                self.s3.download_file(self.bucket_name, self.user_rates_s3, self.user_rates)
+            except Exception as e:
+                print(f'Failed to get the user rates file: {str(e)}')
+                return
+
+        with open(self.user_rates, 'r') as f:
             content = json.load(f)
-        if content:
-            self.init_dates(date = content['date'], center_index = content['center_index'])
-            self.cur_players = content['cur_players'][:]
+
+        self.players_info = content['subscribed']
+        self.foreign_players_rates = content['unsubscribed']
 
     def save_match_info(self):
         """
@@ -723,7 +686,10 @@ class Foot4Ever():
             
         with open(self.match_info, 'w') as f:
             f.write(json.dumps(content))
-                
+             
+        if not self.mode == 'PROD':
+            return
+
         try:
             self.s3.upload_file(self.match_info, self.bucket_name, self.match_info_s3)
         except Exception as e:
@@ -766,7 +732,7 @@ class Foot4Ever():
         user.is_forbidden = True
         user.order_id = -1
 
-        msg = '{}\n{}'.format('بازیکنان محروم:', ', '.join([user.user_name for user in self.all_players if user.is_forbidden]))
+        msg = '{}\n{}'.format(Msg.forbidden_player, ', '.join([user.user_name for user in self.all_players if user.is_forbidden]))
         bot.edit_message_text(text=msg, message_id=query.message.message_id, chat_id=query.message.chat_id)
         bot.send_message(chat_id=query.message.chat_id, text=self.get_program_and_players(), parse_mode='HTML')
 
@@ -783,7 +749,7 @@ class Foot4Ever():
         user.is_forbidden = False
         
         forbidden_players = [user.user_name for user in self.all_players if user.is_forbidden]
-        msg = '{}\n{}'.format('بازیکنان محروم', ', '.join(forbidden_players)) if forbidden_players else Msg.no_forbidden_player
+        msg = '{}\n{}'.format(Msg.forbidden_player, ', '.join(forbidden_players)) if forbidden_players else Msg.no_forbidden_player
         bot.edit_message_text(text=msg, message_id=query.message.message_id, chat_id=query.message.chat_id)
 
     @WithLogError
@@ -858,7 +824,7 @@ class Foot4Ever():
                     self.reset_teams()
                     return
             else:
-                #cur_user = FootUser.get_foot_user(self.all_players, user_id=UserIds.ali_cre) ##
+                #cur_user = FootUser.get_foot_user(self.all_players, user_id=240732760) ##
                 if cur_user.id == list(self.team_keshi.teams.keys())[0].id:
                     msg = '{} {}\n'.format(cur_user.user_name, Msg.restart_timkeshi)
                     msg += '{}, {}'.format(cur_user.user_name, Msg.teamkeshi_welcome)
