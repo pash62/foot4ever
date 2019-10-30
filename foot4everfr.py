@@ -294,7 +294,7 @@ class Foot4Ever():
     Manages everything about weekly foot sessions
     """
     def __init__(self):
-        self.mode = 'os.getenv('MODE')
+        self.mode = os.getenv('MODE')
         self.token = os.getenv('TOKEN')
         updater = Updater(token=self.token, use_context=True)
         self.bot = Bot(self.token)
