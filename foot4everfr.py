@@ -54,7 +54,7 @@ class Msg():
     operation_cancelled = "L'operation a été annulée."
     try_to_del = "a voulu annulé mais je l'ai empêché! Tu veux l'appeler peut-être?"
     next_week_prog = "Le prochain jeu:"
-    reserve = "Les remplaçants"
+    reserve = "Les réserves"
     timkeshi_is_running = "L'arrangement des équipes est en train! Pour recommancer, il faut d'abord annuler celui d'en cours."
     bad_set_prog_msg = "Le format doit être 'date heure, centre',\npar exemple: 01/01/2019 20:30, 0"
     bad_set_prog_succeed = "Le changement suivant a effectué avec du succès:"
