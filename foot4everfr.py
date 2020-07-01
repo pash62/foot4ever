@@ -448,7 +448,7 @@ class Foot4Ever():
 
     @WithLogError
     def get_prog(self, update, context):
-        if self.next_date < datetime.now(pytz.timezone('Europe/Paris')):
+        if self.next_date < datetime.now():
             context.bot.send_message(chat_id=update.message.chat_id, text=Msg.sign_up_not_started)
             return
         msg = '{}\n{}'.format(Msg.next_week_prog, self.get_next_program()) 
@@ -539,7 +539,7 @@ class Foot4Ever():
         cur_chat_id = update.effective_message.chat_id
         user = self.get_user_from_update(update)
         is_pasha = user.first_name.lower() == 'pasha'
-        if self.next_date < datetime.now(pytz.timezone('Europe/Paris')):
+        if self.next_date < datetime.now():
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
             return
             
@@ -564,7 +564,7 @@ class Foot4Ever():
         cur_chat_id = update.effective_message.chat_id
         user = self.get_user_from_update(update)
         is_pasha = user.first_name.lower() == 'pasha'
-        if self.next_date < datetime.now(pytz.timezone('Europe/Paris')):
+        if self.next_date < datetime.now():
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
             return
             
@@ -575,7 +575,7 @@ class Foot4Ever():
         if len(context.args)>0:
             return self.add_del_forced_player(context.bot, update, context.args, False)
         
-        if not is_pasha and datetime.now(pytz.timezone('Europe/Paris')) + timedelta(days=2) > self.next_date:
+        if not is_pasha and datetime.now() + timedelta(days=2) > self.next_date:
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.too_late_del)
             context.bot.send_message(chat_id=self.chat_ids['Foot Admin'], text='{} {}'.format(user.user_name, Msg.try_to_del))
             return
