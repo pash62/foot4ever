@@ -61,7 +61,7 @@ class Msg():
     bad_set_prog_msg = "Le format doit être 'date heure, centre',\npar exemple: 01/01/2019 20:30, 0"
     bad_set_prog_succeed = "Le changement suivant a effectué avec du succès:"
     sign_up_not_started = "La date du prochain jeu n'est pas encore définie."
-    next_potential_date = '45 days later will be {}'
+    next_potential_date = '45 days later will be {} {}'
     
 # The description to set in bot father
 """
@@ -848,9 +848,9 @@ class Foot4Ever():
         """
         if self.is_admin(context.bot, update):
             days = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
-            next_date = (datetime.now(pytz.timezone('Europe/Paris')) + timedelta(days=45)).weekday()
+            next_date = (datetime.now(pytz.timezone('Europe/Paris')) + timedelta(days=45))
             #if weekday in (0, 1, 2): # Monday, Tuesday, Wednesday
-            update.message.reply_text(text=Msg.next_potential_date.format(days[next_date]))
+            update.message.reply_text(text=Msg.next_potential_date.format(days[next_date.weekday()], next_date.strftime("%d/%m/%Y")))
 
 
 def main():
