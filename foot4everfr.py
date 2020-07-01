@@ -59,6 +59,7 @@ class Msg():
     bad_set_prog_msg = "Le format doit être 'date heure, centre',\npar exemple: 01/01/2019 20:30, 0"
     bad_set_prog_succeed = "Le changement suivant a effectué avec du succès:"
     sign_up_not_started = "La date du prochain jeu n'est pas encore définie."
+    next_potential_date = '45 days later will be {}'
     
 # The description to set in bot father
 """
@@ -368,6 +369,7 @@ class Foot4Ever():
         dp.add_handler(CommandHandler('help', self.help))
         dp.add_handler(CommandHandler('help_admins', self.help_admins))
         dp.add_handler(CommandHandler('all', self.get_all_players_username))
+        dp.add_handler(CommandHandler('next', self.get_next_date))
         dp.add_handler(CommandHandler('add_susp', self.show_add_forbidden_player_keyboard, pass_user_data=True))
         dp.add_handler(CommandHandler('del_susp', self.show_del_forbidden_player_keyboard, pass_user_data=True))
         dp.add_handler(CommandHandler('arrange', self.show_timkeshi_buttons, pass_user_data=True))
@@ -795,7 +797,7 @@ class Foot4Ever():
             self.on_btn_del_forbidden_player(context.bot, update)
         else:
             self.on_btn_teamkeshi(context.bot, update)
-    
+        
     def on_btn_teamkeshi(self, bot, update):
         """
         Performs the related action when user touch on of the team-keshi buttons
@@ -837,7 +839,18 @@ class Foot4Ever():
                 self.team_keshi.add_player(cur_user, FootUser.get_foot_user(self.all_players, user_name=query.data.split(':')[0]))
 
         self.on_show_timkeshi_buttons(bot, update)
-
+    
+    def get_next_date(self):
+        """
+        Returns next date in 45 days if it is a football day (Monday, Tuesday, Wednesday)
+        """
+        tz = pytz.timezone('Europe/Paris')
+        today = datetime.now(tz)
+        days = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+        next_date = today + timedelta(days=45)
+        weekday = next_date.weekday()
+        #if weekday in (0, 1, 2): # Monday, Tuesday, Wednesday
+        bot.edit_message_text(text=Msg.next_potential_date.format(days[weekday]), message_id=query.message.message_id, chat_id=query.message.chat_id)
 
 
 def main():
