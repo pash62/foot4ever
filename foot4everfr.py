@@ -71,7 +71,6 @@ players - afficher les joueurs du prochain jeu
 arrange - faire des équipe
 help - aide
 help_admins - aide admins
-next - le jour dans 45 jours
 """
 
 def create_player_keyboard(players):
@@ -842,7 +841,7 @@ class Foot4Ever():
 
         self.on_show_timkeshi_buttons(bot, update)
     
-    def get_next_date(self):
+    def get_next_date(self, update, context):
         """
         Returns next date in 45 days if it is a football day (Monday, Tuesday, Wednesday)
         """
