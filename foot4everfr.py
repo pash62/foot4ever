@@ -15,7 +15,8 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.bot import Bot
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
-import datetime
+from datetime import datetime, timedelta
+import pytz
 import pandas as pd
 import boto3
 
@@ -354,7 +355,7 @@ class Foot4Ever():
         """
         Information about next foot session
         """
-        self.next_date = datetime.datetime.strptime(date, '%d/%m/%Y %H:%M')
+        self.next_date = datetime.strptime(date, '%d/%m/%Y %H:%M')
         self.next_center_index = center_index
         self.centers = {'Aubervilliers':(48.907591, 2.375871), 'La Defense':(48.899902, 2.221698), "Porte d'Ivry":(48.820167, 2.393684)}
 
@@ -447,7 +448,7 @@ class Foot4Ever():
 
     @WithLogError
     def get_prog(self, update, context):
-        if self.next_date < datetime.datetime.now():
+        if self.next_date < datetime.now(pytz.timezone('Europe/Paris')):
             context.bot.send_message(chat_id=update.message.chat_id, text=Msg.sign_up_not_started)
             return
         msg = '{}\n{}'.format(Msg.next_week_prog, self.get_next_program()) 
@@ -461,7 +462,7 @@ class Foot4Ever():
         """
         # another calendar icon: \U0001f4c6
         msg = '\U0001f4c5 <b>{}</b> - {} \n'.format(day_names[self.next_date.weekday()], self.next_date.strftime('%d/%m/%Y'))
-        msg += '\u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+datetime.timedelta(minutes=90)).strftime('%Hh%M'))
+        msg += '\u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+timedelta(minutes=90)).strftime('%Hh%M'))
         msg += '\U0001f4cd Urbansoccer <b>{}</b> \n'.format(list(self.centers.keys())[self.next_center_index])
         return msg
 
@@ -510,7 +511,7 @@ class Foot4Ever():
 
     def get_open_inscription_date(self, date):
         weekday_delta = {6:9, 5:8, 4:7, 3:6, 2:5, 1:4, 0:3}
-        date -= datetime.timedelta(days=weekday_delta[date.weekday()])
+        date -= timedelta(days=weekday_delta[date.weekday()])
         return date.replace(hour=18).replace(minute=0)
 
     def is_admin(self, bot, update):
@@ -538,7 +539,7 @@ class Foot4Ever():
         cur_chat_id = update.effective_message.chat_id
         user = self.get_user_from_update(update)
         is_pasha = user.first_name.lower() == 'pasha'
-        if self.next_date < datetime.datetime.now():
+        if self.next_date < datetime.now(pytz.timezone('Europe/Paris')):
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
             return
             
@@ -563,7 +564,7 @@ class Foot4Ever():
         cur_chat_id = update.effective_message.chat_id
         user = self.get_user_from_update(update)
         is_pasha = user.first_name.lower() == 'pasha'
-        if self.next_date < datetime.datetime.now():
+        if self.next_date < datetime.now(pytz.timezone('Europe/Paris')):
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
             return
             
@@ -574,7 +575,7 @@ class Foot4Ever():
         if len(context.args)>0:
             return self.add_del_forced_player(context.bot, update, context.args, False)
         
-        if not is_pasha and datetime.datetime.now() + datetime.timedelta(days=2) > self.next_date:
+        if not is_pasha and datetime.now(pytz.timezone('Europe/Paris')) + timedelta(days=2) > self.next_date:
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.too_late_del)
             context.bot.send_message(chat_id=self.chat_ids['Foot Admin'], text='{} {}'.format(user.user_name, Msg.try_to_del))
             return
@@ -679,7 +680,7 @@ class Foot4Ever():
         saves match date and participants
         """
         content = {}
-        content['date'] = datetime.datetime.strftime(self.next_date, '%d/%m/%Y %H:%M')
+        content['date'] = datetime.strftime(self.next_date, '%d/%m/%Y %H:%M')
         content['center_index'] = self.next_center_index
         content['cur_players'] = []
         for user in sorted(self.all_players, key = lambda x:x.order_id):
@@ -846,13 +847,10 @@ class Foot4Ever():
         Returns next date in 45 days if it is a football day (Monday, Tuesday, Wednesday)
         """
         if self.is_admin(context.bot, update):
-            tz = pytz.timezone('Europe/Paris')
-            today = datetime.now(tz)
             days = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
-            next_date = today + timedelta(days=45)
-            weekday = next_date.weekday()
+            next_date = datetime.now(pytz.timezone('Europe/Paris')) + timedelta(days=45).weekday()
             #if weekday in (0, 1, 2): # Monday, Tuesday, Wednesday
-            bot.edit_message_text(text=Msg.next_potential_date.format(days[weekday]), message_id=query.message.message_id, chat_id=query.message.chat_id)
+            bot.edit_message_text(text=Msg.next_potential_date.format(days[next_date]), message_id=query.message.message_id, chat_id=query.message.chat_id)
 
 
 def main():
