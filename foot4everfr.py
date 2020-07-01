@@ -32,7 +32,8 @@ admin_cmds = OrderedDict([('add',"S'inscrire dans le prochain match"),
                           ('add_susp',"Susprendre un joueur"),
                           ('del_susp',"Annuler la suspension d'un joueur"),
                           ('set_prog',"Mettre le prochain jeu"),
-                          ('all',"Afficher tous les noms")])
+                          ('all',"Afficher tous les noms"),
+                          ('next', 'Afficher le jour dans 45 jours')])
                           
 class Msg():
     wrong_page_add_del = "Pour s'inscrire ou annuler l'inscription, allez d'abord sur la page du groupe."
@@ -70,6 +71,7 @@ players - afficher les joueurs du prochain jeu
 arrange - faire des équipe
 help - aide
 help_admins - aide admins
+next - le jour dans 45 jours
 """
 
 def create_player_keyboard(players):
@@ -844,13 +846,14 @@ class Foot4Ever():
         """
         Returns next date in 45 days if it is a football day (Monday, Tuesday, Wednesday)
         """
-        tz = pytz.timezone('Europe/Paris')
-        today = datetime.now(tz)
-        days = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
-        next_date = today + timedelta(days=45)
-        weekday = next_date.weekday()
-        #if weekday in (0, 1, 2): # Monday, Tuesday, Wednesday
-        bot.edit_message_text(text=Msg.next_potential_date.format(days[weekday]), message_id=query.message.message_id, chat_id=query.message.chat_id)
+        if self.is_admin(context.bot, update):
+            tz = pytz.timezone('Europe/Paris')
+            today = datetime.now(tz)
+            days = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+            next_date = today + timedelta(days=45)
+            weekday = next_date.weekday()
+            #if weekday in (0, 1, 2): # Monday, Tuesday, Wednesday
+            bot.edit_message_text(text=Msg.next_potential_date.format(days[weekday]), message_id=query.message.message_id, chat_id=query.message.chat_id)
 
 
 def main():
