@@ -462,7 +462,7 @@ class Foot4Ever():
         """
         # another calendar icon: \U0001f4c6
         msg = '\U0001f4c5 <b>{}</b> - {} \n'.format(day_names[self.next_date.weekday()], self.next_date.strftime('%d/%m/%Y'))
-        msg += '\u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+timedelta(minutes=90)).strftime('%Hh%M'))
+        #msg += '\u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+timedelta(minutes=90)).strftime('%Hh%M'))
         msg += '\U0001f4cd Urbansoccer <b>{}</b> \n'.format(list(self.centers.keys())[self.next_center_index])
         return msg
 
