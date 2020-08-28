@@ -271,7 +271,7 @@ class FootUser():
             return pd.Series(players_info[str(self.id)][1])
         if self.user_name.lower() in foreign_players_rates:
             return pd.Series(foreign_players_rates[self.user_name.lower()])
-        return (3.00,3.00,3.00,3.00)
+        return pd.Series((3.00,3.00,3.00,3.00))
 
     @staticmethod
     def make_camel_case(first_name, last_name):
