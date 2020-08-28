@@ -829,8 +829,8 @@ class Foot4Ever():
                     self.reset_teams()
                     return
             else:
-                #if user.first_name.lower() == 'pasha':
-                #cur_user = FootUser.get_foot_user(self.all_players, user_id=240732760) ##
+                if user.first_name.lower() == 'pasha':
+                    cur_user = FootUser.get_foot_user(self.all_players, user_id=240732760) ##
                 if cur_user.id == list(self.team_keshi.teams.keys())[0].id:
                     msg = '{} {}\n'.format(cur_user.user_name, Msg.restart_timkeshi)
                     msg += '{}, {}'.format(cur_user.user_name, Msg.teamkeshi_welcome)
