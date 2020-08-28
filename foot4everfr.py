@@ -462,7 +462,8 @@ class Foot4Ever():
         """
         # another calendar icon: \U0001f4c6
         msg = '\U0001f4c5 <b>{}</b> - {} \n'.format(day_names[self.next_date.weekday()], self.next_date.strftime('%d/%m/%Y'))
-        #msg += '\u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+timedelta(minutes=90)).strftime('%Hh%M'))
+        if self.is_admin(bot, update):
+            msg += '\u23f0 <b>{}</b> - {} \n'.format(self.next_date.strftime('%Hh%M'), (self.next_date+timedelta(minutes=90)).strftime('%Hh%M'))
         msg += '\U0001f4cd Urbansoccer <b>{}</b> \n'.format(list(self.centers.keys())[self.next_center_index])
         return msg
 
@@ -820,14 +821,15 @@ class Foot4Ever():
                     msg = '{}\n{}'.format(Msg.validation_finish, final_teams)
                     bot.edit_message_text(text=msg, chat_id=query.message.chat_id, message_id=query.message.message_id)
                     captain1, captain2 = list(self.team_keshi.teams.keys())[0].user_name, list(self.team_keshi.teams.keys())[1].user_name
-                    self.bot.send_message(self.chat_ids['Foot Admin'], Msg.validation_finish2.format(captain1, captain2))##
-                    #self.bot.send_message(self.chat_ids['Teste team keshi'], Msg.validation_finish2.format(captain1, captain2))##
-                    msg = '{}{}'.format(self.get_next_program(), final_teams)
-                    self.bot.send_message(self.chat_ids['Foot Admin'], msg, parse_mode='HTML')##
-                    #self.bot.send_message(self.chat_ids['Teste team keshi'], msg, parse_mode='HTML')##
+                    #self.bot.send_message(self.chat_ids['Foot Admin'], Msg.validation_finish2.format(captain1, captain2))##
+                    self.bot.send_message(self.chat_ids['Teste team keshi'], Msg.validation_finish2.format(captain1, captain2))##
+                    msg = '{}\n{}'.format(self.get_next_program(), final_teams)
+                    #self.bot.send_message(self.chat_ids['Foot Admin'], msg, parse_mode='HTML')##
+                    self.bot.send_message(self.chat_ids['Teste team keshi'], msg, parse_mode='HTML')##
                     self.reset_teams()
                     return
             else:
+                #if user.first_name.lower() == 'pasha':
                 #cur_user = FootUser.get_foot_user(self.all_players, user_id=240732760) ##
                 if cur_user.id == list(self.team_keshi.teams.keys())[0].id:
                     msg = '{} {}\n'.format(cur_user.user_name, Msg.restart_timkeshi)
@@ -836,7 +838,7 @@ class Foot4Ever():
                     return
                 self.team_keshi.add_captain(cur_user) # Add 2nd captain
         else:
-            #cur_user = self.team_keshi.whose_turn() ##
+            cur_user = self.team_keshi.whose_turn() ##
             if cur_user.id == self.team_keshi.whose_turn().id:
                 self.team_keshi.add_player(cur_user, FootUser.get_foot_user(self.all_players, user_name=query.data.split(':')[0]))
 
