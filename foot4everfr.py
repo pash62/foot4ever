@@ -672,6 +672,7 @@ class Foot4Ever():
         with open(self.user_rates, 'r') as f:
             content = json.load(f)
 
+        print(content)
         self.players_info = content['subscribed']
         self.foreign_players_rates = content['unsubscribed']
 
