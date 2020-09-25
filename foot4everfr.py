@@ -357,7 +357,10 @@ class Foot4Ever():
         """
         self.next_date = datetime.strptime(date, '%d/%m/%Y %H:%M')
         self.next_center_index = center_index
-        self.centers = {'Aubervilliers':(48.907591, 2.375871), 'La Defense':(48.899902, 2.221698), "Porte d'Ivry":(48.820167, 2.393684)}
+        self.centers = {'Aubervilliers':(48.907591, 2.375871),
+                        'La Defense':(48.899902, 2.221698),
+                        "Porte d'Ivry":(48.820167, 2.393684),
+                        'Evry': (48.629227, 2.405759)}
 
     def init_commands(self, dp):
         """
