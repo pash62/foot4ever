@@ -103,7 +103,7 @@ class MotFr():
     saturday = 'Samedi'
     sunday = 'Dimanche'
 
-    cancel = 'Anuler'
+    cancel = 'Annuler'
     yes = 'Oui'
     no = 'Non'
     jan = 'cher, '
@@ -361,7 +361,8 @@ class Foot4Ever():
                         'Urbansoccer,La Defense':(48.899902, 2.221698),
                         "Urbansoccer,Porte d'Ivry":(48.820167, 2.393684),
                         "Stade du,Pré Saint-Jean":(48.841287, 2.2000618),
-                        'Urbansoccer,Evry': (48.629227, 2.405759)}
+                        'Urbansoccer,Evry': (48.629227, 2.405759),
+                        'Stade de,La Muette': (48.8647587, 2.2695797)}
 
     def init_commands(self, dp):
         """
