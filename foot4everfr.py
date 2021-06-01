@@ -276,7 +276,10 @@ class FootUser():
     @staticmethod
     def make_camel_case(first_name, last_name):
         def to_camel_case(value):
-            return f'{value[0].upper()}{value[1:].lower()}'
+            try:
+                return f'{value[0].upper()}{value[1:].lower()}'
+            except:
+                return value
 
         if first_name and last_name:
             return f'{to_camel_case(first_name)} {to_camel_case(last_name)}'
