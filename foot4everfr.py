@@ -275,10 +275,15 @@ class FootUser():
 
     @staticmethod
     def make_camel_case(first_name, last_name):
-        try:
-            return '{}{} {}{}'.format(first_name[0].upper(), first_name[1:].lower(), last_name[0].upper(), last_name[1].lower())
-        except:
-            return '{}{}'.format(first_name[0].upper(), first_name[1:].lower())
+        def to_camel_case(value):
+            return f'{value[0].upper()}{value[1:].lower()}'
+
+        if first_name and last_name:
+            return f'{to_camel_case(first_name)} {to_camel_case(last_name)}'
+        elif first_name:
+            return to_camel_case(first_name)
+        else:
+            return to_camel_case(last_name)
 
     @staticmethod
     def get_foot_user(all_players, user_id=None, user_name=None):
