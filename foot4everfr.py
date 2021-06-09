@@ -296,8 +296,11 @@ class FootUser():
         for user in all_players:
             if user_id and user.id == user_id:
                 return user
-            if user_name and user.user_name.lower() == user_name.lower():
-                return user
+            try:
+                if user_name and user.user_name.lower() == user_name.lower():
+                    return user
+            except:
+                pass
 
 
 class Foot4Ever():
