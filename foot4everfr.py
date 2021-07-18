@@ -429,7 +429,7 @@ class Foot4Ever():
             if user.id in self.cur_players:
                 user.order_id = self.cur_players.index(user.id)
                 #print(f'{user.order_id},{user.user_name}')
-            if user.first_name.lower() in ['pasha', 'saman']:
+            if user.first_name.lower() in ['pasha', 'saman', 'hamed']:
                 self.admins.append(user.id)
                 user.is_admin = True
             self.all_players.append(user)
