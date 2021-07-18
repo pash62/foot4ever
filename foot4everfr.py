@@ -62,6 +62,7 @@ class Msg():
     bad_set_prog_succeed = "Le changement suivant a effectué avec du succès:"
     sign_up_not_started = "La date du prochain jeu n'est pas encore définie."
     next_potential_date = '45 days later will be {} {}'
+    sign_up_not_authorized = "Stp mets d'abord un prénom et/ou nom sur ton profile Telegram puis réessaie."
     
 # The description to set in bot father
 """
@@ -269,7 +270,7 @@ class FootUser():
     def get_rates(self, players_info, foreign_players_rates):
         if str(self.id) in list(players_info.keys()):
             return pd.Series(players_info[str(self.id)][1])
-        if self.user_name.lower() in foreign_players_rates:
+        if self.user_name and self.user_name.lower() in foreign_players_rates:
             return pd.Series(foreign_players_rates[self.user_name.lower()])
         return pd.Series((3.00,3.00,3.00,3.00))
 
@@ -285,8 +286,10 @@ class FootUser():
             return f'{to_camel_case(first_name)} {to_camel_case(last_name)}'
         elif first_name:
             return to_camel_case(first_name)
-        else:
+        elif last_name:
             return to_camel_case(last_name)
+        else:
+            return to_camel_case('joueur', 'inconnu')
 
     @staticmethod
     def get_foot_user(all_players, user_id=None, user_name=None):
@@ -508,9 +511,9 @@ class Foot4Ever():
     @WithLogError
     def start(self, update, context):
         return
-        txt = 'به روبات گروه فوتبال خوش آمدید. دستورات زیر قابل استفاده می باشند'
+        txt = 'Bienvenu à Foot4ever. Voici les commandes utilisables:'
         for cmd, help in public_cmds.items():
-            help_txt += '\n{}: /{}'.format(help, cmd)
+            txt += '\n{}: /{}'.format(help, cmd)
         context.bot.send_message(chat_id=update.message.chat_id, text=txt)
 
     def get_user_from_update(self, update):
@@ -555,6 +558,9 @@ class Foot4Ever():
     def add_player(self, update, context):
         cur_chat_id = update.effective_message.chat_id
         user = self.get_user_from_update(update)
+        if not user.user_name:
+            context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_authorized)
+
         is_pasha = user.first_name.lower() == 'pasha'
         if self.next_date < datetime.now():
             context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
