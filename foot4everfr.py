@@ -289,7 +289,7 @@ class FootUser():
         elif last_name:
             return to_camel_case(last_name)
         else:
-            return to_camel_case('joueur', 'inconnu')
+            return to_camel_case('inconnu')
 
     @staticmethod
     def get_foot_user(all_players, user_id=None, user_name=None):
