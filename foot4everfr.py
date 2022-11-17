@@ -337,8 +337,10 @@ class Foot4Ever():
         elif self.mode == 'PROD':
             port = int(os.environ.get('PORT', '8443'))
             app_name = os.environ.get('APP_NAME')
-            updater.start_webhook(listen='0.0.0.0', port=port, url_path=self.token)
-            updater.bot.set_webhook("https://{}.herokuapp.com/{}".format(app_name, self.token))
+            updater.start_webhook(listen='0.0.0.0',
+                                  port=port,
+                                  url_path=self.token,
+                                  webhook_url=f"https://{app_name}.herokuapp.com/{self.token}")
         else:
             logger.error('Invalid mode')
             sys.exit(1)
