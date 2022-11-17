@@ -1,6 +1,6 @@
 django
 gunicorn
 django-heroku
-python-telegram-bot~=13.2
+python-telegram-bot~=12.8
 pandas
 boto3
