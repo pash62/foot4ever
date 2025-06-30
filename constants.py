@@ -2,10 +2,11 @@ import os
 from collections import OrderedDict
 
 
-ADMIN_CHAT_ID = int(os.environ.get('ADMIN_CHAT_ID', -280450485))
-MAIN_CHAT_ID = int(os.environ.get('MAIN_CHAT_ID', -1001166982817))
+ADMIN_CHAT_ID = int(os.environ['ADMIN_CHAT_ID'])
+MAIN_CHAT_ID = int(os.environ['MAIN_CHAT_ID'])
 URBAN_CITY = os.environ['URBAN_CITY']
 PASHA_USER_ID = int(os.environ.get('PASHA_USER_ID'))
+SAM_USER_ID = int(os.environ.get('SAM_USER_ID'))
 MATCH_INFO_FILE = f'match_info_{URBAN_CITY}.txt'
 USER_RATES_FILE = f'user_rates_{URBAN_CITY}.json'
 
@@ -35,7 +36,7 @@ class Msg():  # pylint:disable=too-few-public-methods
     too_late_del = "L'inscription ne peut pas être annulée dans les dernières 48h! Tu contactes les admins stp."
     restart_timkeshi = "Je ne parlais pas à toi, je parlais au deuxième capitaine"
     missing_permission = "Tu n'es pas autorisé à utiliser cette commande! Désolé!"
-    add_hint = "Pour rajouter t'inscrire', tu écris juste /add (sans ton prénom)."
+    add_hint = "Pour t'inscrire', tu écris juste /add (sans ton prénom)."
     select_player = "c'est à toi de choisir (le score est de 1 à 5 dans cet ordre: goal, défense, attaque, course)"
     teamkeshi_welcome = "je te remercie d'avoir commancé l'arrangement des équipes. Le deuxième capitaine, quelle couleur choisis-tu?"
     validation_finish = "Parfait! Tout est nickel, les équipes seront envoyées aux admins."
