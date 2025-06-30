@@ -27,7 +27,8 @@ from constants import (
     MAIN_CHAT_ID,
     MATCH_INFO_FILE,
     USER_RATES_FILE,
-    PASHA_USER_ID
+    PASHA_USER_ID,
+    SAM_USER_ID
 )
 from teamkeshi import TeamKeshi, create_player_keyboard, create_team_color_keyboard
 
@@ -380,8 +381,8 @@ class Foot4Ever():
         Returns True if the user is admin, else returns False with an alert message
         """
         user = self.get_user_from_update(update)
-        is_pasha = user.id == PASHA_USER_ID
-        if not user.is_admin and not is_pasha:
+        is_pasha_or_sam = user.id in (PASHA_USER_ID, SAM_USER_ID)
+        if not user.is_admin and not is_pasha_or_sam:
             await bot.send_message(chat_id=update.effective_message.chat_id, text=Msg.missing_permission)
             return False
         return True
@@ -411,8 +412,8 @@ class Foot4Ever():
             await context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
             return
 
-        is_pasha = user.id == PASHA_USER_ID
-        if not is_pasha and cur_chat_id != MAIN_CHAT_ID:
+        is_pasha_or_sam = user.id in (PASHA_USER_ID, SAM_USER_ID)
+        if not is_pasha_or_sam and cur_chat_id != MAIN_CHAT_ID:
             await context.bot.send_message(chat_id=cur_chat_id, text=Msg.wrong_page_add_del)
             return
 
@@ -442,15 +443,15 @@ class Foot4Ever():
             await context.bot.send_message(chat_id=cur_chat_id, text=Msg.sign_up_not_started)
             return
 
-        is_pasha = user.id == PASHA_USER_ID
-        if cur_chat_id != MAIN_CHAT_ID and not is_pasha:
+        is_pasha_or_sam = user.id in (PASHA_USER_ID, SAM_USER_ID)
+        if cur_chat_id != MAIN_CHAT_ID and not is_pasha_or_sam:
             await context.bot.send_message(chat_id=cur_chat_id, text=Msg.wrong_page_add_del)
             return
 
         if len(context.args) > 0:
             return await self.add_del_forced_player(context.bot, update, context.args, False)
 
-        if not is_pasha and datetime.now() + timedelta(days=2) > self.next_date:
+        if not is_pasha_or_sam and datetime.now() + timedelta(days=2) > self.next_date:
             await context.bot.send_message(chat_id=cur_chat_id, text=Msg.too_late_del)
             await context.bot.send_message(chat_id=ADMIN_CHAT_ID,
                                            text=f'{user.user_name} {Msg.try_to_del}')
