@@ -209,7 +209,8 @@ class Foot4Ever():
                         "Urbansoccer,Porte d'Ivry": (48.820167, 2.393684),
                         "Stade du,Pré Saint-Jean": (48.841287, 2.2000618),
                         'Urbansoccer,Evry': (48.629227, 2.405759),
-                        'Stade de,La Muette': (48.8647587, 2.2695797)}
+                        'Stade de,La Muette': (48.8647587, 2.2695797),
+                        'B14 Bondoufle': (48.62230106658565, 2.379971648707107)}
 
     def init_commands(self, app):
         """
